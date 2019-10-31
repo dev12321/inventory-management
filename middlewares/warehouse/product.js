@@ -110,7 +110,7 @@ const getProducts = async (req, res) => {
 };
 
 const getProduct = async (req, res) => {
-  const products = await productModel.findById(req.params.id);
+  const products = await productModel.findById(req.params.productID);
   if (products) res.status(200).json({ payload: product, msg: "success" });
   else res.status(200).json({ err: "No Document Found" });
 };

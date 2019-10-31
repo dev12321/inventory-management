@@ -58,7 +58,7 @@ const getShipments = async (req, res) => {
 
 const getShipment = async (req, res) => {
   const { user } = req.body;
-  const shipment = await shipmentModel.findById(req.params.id);
+  const shipment = await shipmentModel.findById(req.params.shipmentID);
   if (shipment) res.status(200).json({ payload: shipment, msg: "success" });
   else res.status(200).json({ err: "No Document Found" });
 };
