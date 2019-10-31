@@ -53,8 +53,21 @@ const deleteGroup = async ({ body }, res) => {
   }
 };
 
+const getGroups = async (req, res) => {
+  const { user } = req.body;
+  if (user.role < 2) {
+    const groups = await groupModel.find();
+    if (groups.length > 0)
+      res.status(200).json({ payload: groups, msg: "success" });
+    else res.status(200).json({ err: "No Documents Found" });
+  } else {
+    res.status(403).json({ err: "Not Autherised" });
+  }
+};
+
 module.exports = {
   addGroup,
   updateGroup,
-  deleteGroup
+  deleteGroup,
+  getGroups
 };

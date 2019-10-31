@@ -25,17 +25,11 @@ const addShipment = async ({ body }, res) => {
 
 const updateShipment = async ({ body }, res) => {
   const { id, products, status, type, user } = body;
-  if (user.role < 2) {
-    const shipment = shipmentModel.findById(id);
-    shipment.products = products;
-    shipment.status = status;
-    shipment.type = type;
+  const shipment = shipmentModel.findById(id);
+  shipment.status = status;
 
-    await shipment.save();
-    res.status(200).json({ payload: shipment, msg: "success" });
-  } else {
-    res.status(403).json({ err: "Not Autherised" });
-  }
+  await shipment.save();
+  res.status(200).json({ payload: shipment, msg: "success" });
 };
 
 const deleteShipment = async ({ body }, res) => {
@@ -52,8 +46,48 @@ const deleteShipment = async ({ body }, res) => {
   }
 };
 
+const getShipments = async (req, res) => {
+  const shipments = await shipmentModel
+    .find()
+    .skip(req.query.offset)
+    .limit(req.query.limit);
+  if (shipments.length > 0)
+    res.status(200).json({ payload: shipments, msg: "success" });
+  else res.status(200).json({ err: "No Documents Found" });
+};
+
+const getShipment = async (req, res) => {
+  const { user } = req.body;
+  const shipment = await shipmentModel.findById(req.params.id);
+  if (shipment) res.status(200).json({ payload: shipment, msg: "success" });
+  else res.status(200).json({ err: "No Document Found" });
+};
+
+const getShipmentsByStatus = async (req, res) => {
+  const shipments = await shipmentModel
+    .find({ status: req.query.status })
+    .skip(req.query.offset)
+    .limit(req.query.limit);
+  if (shipments.length > 0)
+    res.status(200).json({ payload: shipments, msg: "success" });
+  else res.status(200).json({ err: "No Documents Found" });
+};
+const getShipmentsByType = async (req, res) => {
+  const shipments = await shipmentModel
+    .find({ type: req.query.type })
+    .skip(req.query.offset)
+    .limit(req.query.limit);
+  if (shipments.length > 0)
+    res.status(200).json({ payload: shipments, msg: "success" });
+  else res.status(200).json({ err: "No Documents Found" });
+};
+
 module.exports = {
   addShipment,
   updateShipment,
-  deleteShipment
+  deleteShipment,
+  getShipments,
+  getShipment,
+  getShipmentsByStatus,
+  getShipmentsByType
 };

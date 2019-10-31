@@ -99,8 +99,37 @@ const deleteProduct = async ({ body }, res) => {
   }
 };
 
+const getProducts = async (req, res) => {
+  const products = await productModel
+    .find()
+    .skip(req.query.offset)
+    .limit(req.query.limit);
+  if (products.length > 0)
+    res.status(200).json({ payload: products, msg: "success" });
+  else res.status(200).json({ err: "No Documents Found" });
+};
+
+const getProduct = async (req, res) => {
+  const products = await productModel.findById(req.params.id);
+  if (products) res.status(200).json({ payload: product, msg: "success" });
+  else res.status(200).json({ err: "No Document Found" });
+};
+
+const getProductsByGroup = async (req, res) => {
+  const products = await productModel
+    .find({ group: req.params.groupID })
+    .skip(req.query.offset)
+    .limit(req.query.limit);
+  if (products.length > 0)
+    res.status(200).json({ payload: products, msg: "success" });
+  else res.status(200).json({ err: "No Documents Found" });
+};
+
 module.exports = {
   addProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  getProducts,
+  getProduct,
+  getProductsByGroup
 };
