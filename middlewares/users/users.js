@@ -8,39 +8,13 @@ const jwt = require("jsonwebtoken");
 require("../../models/user");
 const userModel = mongoose.model("User");
 
-// const registerUser = async ({ body }, res, next) => {
-//   const { fullName, email, password, phone } = body;
-//   // console.log(fullName, email, password, role, userID);
-//   const userData = await userModel.findOne({ email });
-//   if (userData) {
-//     return res.status(400).json({ err: "Email already exists" });
-//   }
-
-//   try {
-//     const user = new userModel();
-
-//     user.fullName = fullName;
-//     user.email = email;
-//     user.phone = phone;
-//     user.role = "user";
-//     const hashPassword = await bcrypt.hash(password, constants.SALT_ROUNDS);
-//     user.passwordHash = hashPassword;
-//     await user.save();
-//     return res.json({ msg: "user created successfully" });
-//     // console.log(newUser);
-//   } catch (err) {
-//     console.log(err);
-//     return res.status(500).json({ err: "Error adding a new user" });
-//   }
-// };
-
 const registerUser = async ({ body }, res) => {
   const { fullName, email, password, phone } = body;
 
   Users = new userModel({
     fullName,
     phone,
-    role: "user",
+    role: 2,
     username: email
   });
 
@@ -56,31 +30,6 @@ const registerUser = async ({ body }, res) => {
     }
   });
 };
-
-// const loginUser = async ({ body }, res) => {
-//   try {
-//     const { email, password } = body;
-//     const user = await userModel.findOne({ email });
-//     if (!user) {
-//       return res.status(404).json({ err: true, message: "User not found" });
-//     }
-
-//     const isMatch = await bcrypt.compare(password, user.passwordHash);
-//     if (!isMatch) {
-//       return res.status(400).json({ err: true, message: "Incorrect Password" });
-//     } else {
-//       const userToken = await user.toAuthJSON();
-//       return res.status(200).json(userToken);
-//     }
-//   } catch (err) {
-//     console.log(err);
-
-//     return res.status(500).json({
-//       err: true,
-//       message: "Unable to login"
-//     });
-//   }
-// };
 
 const loginUser = (req, res) => {
   const { email, password } = req.body;

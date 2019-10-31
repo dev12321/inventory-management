@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema(
       match: [/\S+@\S+\.\S+/, "Email is invalid"]
     },
     phone: mongoose.SchemaTypes.Number,
-    role: mongoose.SchemaTypes.String
+    role: mongoose.SchemaTypes.Number
   },
   { timestamps: true }
 );
