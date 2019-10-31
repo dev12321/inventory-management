@@ -11,7 +11,7 @@ const userModel = mongoose.model("User");
 const registerUser = async ({ body }, res) => {
   const { fullName, email, password, phone } = body;
 
-  Users = new userModel({
+  const Users = new userModel({
     fullName,
     phone,
     role: 2,
@@ -65,7 +65,22 @@ const loginUser = (req, res) => {
   })(req, res);
 };
 
+const removeUser = ({ body }, res) => {
+  const { id, user } = body;
+  if (user.role < 1) {
+    const user = userModel.findByIdAndDelete(id);
+    if (user) {
+      res.status(200).json({ payload: user, msg: "success" });
+    } else {
+      res.status(200).json({ err: "user not found" });
+    }
+  } else {
+    res.status(403).json({ err: "Not Autherised" });
+  }
+};
+
 module.exports = {
   loginUser,
-  registerUser
+  registerUser,
+  removeUser
 };

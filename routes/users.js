@@ -10,8 +10,6 @@ const validateLoginInput = require("../middlewares/users/validation/login");
 router.post("/login", validateLoginInput, users.loginUser);
 router.post("/register", validateRegisterInput, users.registerUser);
 router.use(passport.authenticate("jwt", { session: false }));
-// router.get("/users", users.getUsers);
-// router.get("/users/:userId", users.getSingleUser);
-// router.put("/users/:userId", users.updateUser);
+router.delete("/delete", users.removeUser);
 
 module.exports = router;

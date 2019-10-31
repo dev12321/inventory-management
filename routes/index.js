@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const users = require("./users");
-const inventory = require("./inventory");
+const warehouse = require("./warehouse");
 
 router.use("/users", users);
-router.use("/inventory", inventory);
+router.use("/warehouse", warehouse);
 
 module.exports = router;

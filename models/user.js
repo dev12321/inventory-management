@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
-// const jwt = require("jsonwebtoken");
-const constants = require("../utils/constants");
 const passportLocalMongoose = require("passport-local-mongoose");
 // const uidGenerator = require("../utils/uniqueIDGenerator");
 
@@ -29,29 +27,5 @@ const UserSchema = new mongoose.Schema(
 
 UserSchema.plugin(uniqueValidator, { message: "is already taken." });
 UserSchema.plugin(passportLocalMongoose);
-
-// UserSchema.methods.generateJWT = function() {
-//   const today = new Date();
-//   const exp = new Date(today);
-//   exp.setDate(today.getDate() + 60);
-
-//   return jwt.sign(
-//     {
-//       id: this._id,
-//       email: this.email,
-//       role: this.role,
-//       exp: parseInt(exp.getTime() / 1000)
-//     },
-//     constants.JWT_SECRET
-//   );
-// };
-
-// UserSchema.methods.toAuthJSON = function() {
-//   return {
-//     fullName: this.fullName,
-//     email: this.email,
-//     token: this.generateJWT()
-//   };
-// };
 
 mongoose.model("User", UserSchema);
