@@ -50,7 +50,8 @@ const getShipments = async (req, res) => {
   const shipments = await shipmentModel
     .find()
     .skip(req.query.offset)
-    .limit(req.query.limit);
+    .limit(req.query.limit)
+    .populate();
   if (shipments.length > 0)
     res.status(200).json({ payload: shipments, msg: "success" });
   else res.status(200).json({ err: "No Documents Found" });
@@ -58,7 +59,9 @@ const getShipments = async (req, res) => {
 
 const getShipment = async (req, res) => {
   const { user } = req.body;
-  const shipment = await shipmentModel.findById(req.params.shipmentID);
+  const shipment = await shipmentModel
+    .findById(req.params.shipmentID)
+    .populate();
   if (shipment) res.status(200).json({ payload: shipment, msg: "success" });
   else res.status(200).json({ err: "No Document Found" });
 };
@@ -67,7 +70,8 @@ const getShipmentsByStatus = async (req, res) => {
   const shipments = await shipmentModel
     .find({ status: req.query.status })
     .skip(req.query.offset)
-    .limit(req.query.limit);
+    .limit(req.query.limit)
+    .populate();
   if (shipments.length > 0)
     res.status(200).json({ payload: shipments, msg: "success" });
   else res.status(200).json({ err: "No Documents Found" });
@@ -76,7 +80,8 @@ const getShipmentsByType = async (req, res) => {
   const shipments = await shipmentModel
     .find({ type: req.query.type })
     .skip(req.query.offset)
-    .limit(req.query.limit);
+    .limit(req.query.limit)
+    .populate();
   if (shipments.length > 0)
     res.status(200).json({ payload: shipments, msg: "success" });
   else res.status(200).json({ err: "No Documents Found" });
