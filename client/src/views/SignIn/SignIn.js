@@ -18,14 +18,15 @@ import { Formik, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import CustomSnackbar from "./../../components/Snackbar";
+import * as loadingActions from "./../../components/Loading/actions";
+import { connect } from "react-redux";
+import * as actions from "./../../reducerActions/users";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{" "}
+      Inventory Management
       {new Date().getFullYear()}
       {"."}
     </Typography>
@@ -72,7 +73,9 @@ function SignIn(props) {
 
     setSnackbarDetails({ ...snackbarDetails, open: false });
   };
-
+  // if (props.currentUser.email) {
+  //   props.history.push('/')
+  // }
   return (
     <Container component="main" maxWidth="xs">
       <CustomSnackbar
@@ -92,9 +95,14 @@ function SignIn(props) {
         <Formik
           initialValues={{ email: "", password: "" }}
           onSubmit={values => {
+            props.showLoading();
             axios
               .post("/api/users/login", values)
               .then(res => {
+                props.hideLoading();
+                console.log(res.data);
+
+                props.loadCurrentUser(res.data.user);
                 setSnackbarDetails({
                   message: res.data.message,
                   variant: "success",
@@ -103,13 +111,14 @@ function SignIn(props) {
                 localStorage.setItem("IToken", res.data.token);
                 props.history.push("/");
               })
-              .catch(err =>
+              .catch(err => {
+                props.hideLoading();
                 setSnackbarDetails({
                   message: err.response.data.message,
                   variant: "error",
                   open: true
-                })
-              );
+                });
+              });
           }}
           validationSchema={Yup.object().shape({
             email: Yup.string()
@@ -208,4 +217,29 @@ function SignIn(props) {
   );
 }
 
-export default SignIn;
+const mapStateToProps = state => {
+  // console.log("YOO STATE in Overview")
+  // console.log(state);
+  // console.log(state.firebase.profile);
+  return {
+    currentUser: state.common.currentUser,
+    loading: state.common.loading
+  };
+};
+
+const mapDispachToProps = (dispatch, props) => ({
+  showLoading: () => {
+    dispatch(loadingActions.showLoading());
+  },
+  hideLoading: () => {
+    dispatch(loadingActions.hideLoading());
+  },
+  loadCurrentUser: user => {
+    dispatch(actions.loadUser(user));
+  }
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispachToProps
+)(SignIn);

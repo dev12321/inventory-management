@@ -34,6 +34,12 @@ const Topbar = props => {
 
   const [notifications] = useState([]);
 
+  const handleSignOut = () => {
+    localStorage.clear();
+    console.log(props);
+    props.history.push("/sign-in");
+  };
+
   return (
     <AppBar {...rest} className={clsx(classes.root, className)}>
       <Toolbar>
@@ -51,16 +57,11 @@ const Topbar = props => {
         </RouterLink>
         <div className={classes.flexGrow} />
         <Hidden mdDown>
-          <IconButton color="inherit">
-            <Badge
-              badgeContent={notifications.length}
-              color="primary"
-              variant="dot"
-            >
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <IconButton className={classes.signOutButton} color="inherit">
+          <IconButton
+            className={classes.signOutButton}
+            color="inherit"
+            onClick={handleSignOut}
+          >
             <InputIcon />
           </IconButton>
         </Hidden>

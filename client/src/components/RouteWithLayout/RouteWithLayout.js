@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import jwt_decode from "jwt-decode";
 import { connect } from "react-redux";
 import * as loadingActions from "./../Loading/actions";
+import * as userActions from "./../../reducerActions/users";
 class RouteWithLayout extends Component {
   constructor(props) {
     super(props);
@@ -12,15 +13,18 @@ class RouteWithLayout extends Component {
     };
   }
   componentWillMount() {
-    this.props.showLoading();
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decodedToken = jwt_decode(token);
-      if (decodedToken && decodedToken.email) {
-        this.setState({ isAuth: true });
+    if (this.props.authRequired) {
+      this.props.showLoading();
+      const token = localStorage.getItem("IToken");
+      if (token) {
+        const decodedToken = jwt_decode(token);
+        if (decodedToken && decodedToken.email) {
+          this.setState({ isAuth: true });
+        }
+        this.props.loadUser(decodedToken);
       }
+      this.props.hideLoading();
     }
-    this.props.hideLoading();
   }
 
   render() {
@@ -30,7 +34,7 @@ class RouteWithLayout extends Component {
       authRequired,
       ...rest
     } = this.props;
-    console.log(!authRequired, this.state.isAuth);
+    // console.log(!authRequired, this.state.isAuth);
     return (
       <Route
         {...rest}
@@ -70,6 +74,9 @@ const mapDispachToProps = (dispatch, props) => ({
   },
   hideLoading: () => {
     dispatch(loadingActions.hideLoading());
+  },
+  loadUser: user => {
+    dispatch(userActions.loadUser(user));
   }
 });
 

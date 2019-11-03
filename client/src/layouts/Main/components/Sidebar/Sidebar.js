@@ -1,32 +1,33 @@
-import React from 'react';
-import clsx from 'clsx';
-import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
-import { Divider, Drawer } from '@material-ui/core';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import PeopleIcon from '@material-ui/icons/People';
-import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
-import TextFieldsIcon from '@material-ui/icons/TextFields';
-import ImageIcon from '@material-ui/icons/Image';
-import AccountBoxIcon from '@material-ui/icons/AccountBox';
-import SettingsIcon from '@material-ui/icons/Settings';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
+import React from "react";
+import clsx from "clsx";
+import PropTypes from "prop-types";
+import { makeStyles } from "@material-ui/styles";
+import { Divider, Drawer } from "@material-ui/core";
+import DashboardIcon from "@material-ui/icons/Dashboard";
+import PeopleIcon from "@material-ui/icons/People";
+import ShoppingBasketIcon from "@material-ui/icons/ShoppingBasket";
+import TextFieldsIcon from "@material-ui/icons/TextFields";
+import ImageIcon from "@material-ui/icons/Image";
+import AccountBoxIcon from "@material-ui/icons/AccountBox";
+import SettingsIcon from "@material-ui/icons/Settings";
+import LocalShippingIcon from "@material-ui/icons/LocalShipping";
+import { connect } from "react-redux";
 
-import { Profile, SidebarNav, UpgradePlan } from './components';
+import { Profile, SidebarNav } from "./components";
 
 const useStyles = makeStyles(theme => ({
   drawer: {
     width: 240,
-    [theme.breakpoints.up('lg')]: {
+    [theme.breakpoints.up("lg")]: {
       marginTop: 64,
-      height: 'calc(100% - 64px)'
+      height: "calc(100% - 64px)"
     }
   },
   root: {
     backgroundColor: theme.palette.white,
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
     padding: theme.spacing(2)
   },
   divider: {
@@ -41,46 +42,41 @@ const Sidebar = props => {
   const { open, variant, onClose, className, ...rest } = props;
 
   const classes = useStyles();
-
+  const superAdminPages =
+    props.currentUser.role > 1
+      ? [
+          {
+            title: "Users",
+            href: "/users",
+            icon: <PeopleIcon />
+          }
+        ]
+      : [];
   const pages = [
     {
-      title: 'Dashboard',
-      href: '/dashboard',
+      title: "Dashboard",
+      href: "/dashboard",
       icon: <DashboardIcon />
     },
+    ...superAdminPages,
     {
-      title: 'Users',
-      href: '/users',
-      icon: <PeopleIcon />
-    },
-    {
-      title: 'Products',
-      href: '/products',
+      title: "Products",
+      href: "/products",
       icon: <ShoppingBasketIcon />
     },
     {
-      title: 'Authentication',
-      href: '/sign-in',
-      icon: <LockOpenIcon />
+      title: "Shipments",
+      href: "/shipments",
+      icon: <LocalShippingIcon />
     },
     {
-      title: 'Typography',
-      href: '/typography',
-      icon: <TextFieldsIcon />
-    },
-    {
-      title: 'Icons',
-      href: '/icons',
-      icon: <ImageIcon />
-    },
-    {
-      title: 'Account',
-      href: '/account',
+      title: "Account",
+      href: "/account",
       icon: <AccountBoxIcon />
     },
     {
-      title: 'Settings',
-      href: '/settings',
+      title: "Settings",
+      href: "/settings",
       icon: <SettingsIcon />
     }
   ];
@@ -93,17 +89,10 @@ const Sidebar = props => {
       open={open}
       variant={variant}
     >
-      <div
-        {...rest}
-        className={clsx(classes.root, className)}
-      >
+      <div {...rest} className={clsx(classes.root, className)}>
         <Profile />
         <Divider className={classes.divider} />
-        <SidebarNav
-          className={classes.nav}
-          pages={pages}
-        />
-        <UpgradePlan />
+        <SidebarNav className={classes.nav} pages={pages} />
       </div>
     </Drawer>
   );
@@ -116,4 +105,10 @@ Sidebar.propTypes = {
   variant: PropTypes.string.isRequired
 };
 
-export default Sidebar;
+const mapStateToProps = state => {
+  return {
+    currentUser: state.common.currentUser
+  };
+};
+
+export default connect(mapStateToProps)(Sidebar);

@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { RouteWithLayout } from "../components";
 import { Main as MainLayout, Minimal as MinimalLayout } from "../layouts";
 import {
-  //   Dashboard as DashboardView,
+  Dashboard as DashboardView,
   //   ProductList as ProductListView,
   //   UserList as UserListView,
   //   Typography as TypographyView,
@@ -21,16 +21,16 @@ import {
 const Routes = () => {
   return (
     <Switch>
-      <Redirect exact from="/" to="/sign-in" />
+      <Redirect exact from="/" to="/dashboard" />
 
-      {/* <RouteWithLayout
-        authRequired={false}
+      <RouteWithLayout
+        authRequired={true}
         component={DashboardView}
         exact
         layout={MainLayout}
         path="/dashboard"
       />
-      <RouteWithLayout
+      {/* <RouteWithLayout
         authRequired={false}
         component={UserListView}
         exact
