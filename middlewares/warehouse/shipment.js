@@ -68,7 +68,7 @@ const getShipment = async (req, res) => {
 
 const getShipmentsByStatus = async (req, res) => {
   const shipments = await shipmentModel
-    .find({ status: req.query.status })
+    .find({ status: req.params.status })
     .skip(req.query.offset)
     .limit(req.query.limit)
     .populate();
@@ -78,7 +78,7 @@ const getShipmentsByStatus = async (req, res) => {
 };
 const getShipmentsByType = async (req, res) => {
   const shipments = await shipmentModel
-    .find({ type: req.query.type })
+    .find({ type: req.params.type })
     .skip(req.query.offset)
     .limit(req.query.limit)
     .populate();

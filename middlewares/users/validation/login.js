@@ -6,7 +6,9 @@ const validateLoginInput = celebrate({
   body: Joi.object().keys({
     password: Joi.string()
       .required()
-      .error(new Error("Password is required")),
+      .min(8)
+      .max(12)
+      .error(new Error("Enter valid password")),
     email: Joi.string()
       .email()
       .required()

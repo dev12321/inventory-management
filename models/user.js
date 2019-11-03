@@ -3,9 +3,6 @@ const uniqueValidator = require("mongoose-unique-validator");
 const passportLocalMongoose = require("passport-local-mongoose");
 // const uidGenerator = require("../utils/uniqueIDGenerator");
 
-// plugin for passport-local-mongoose
-
-// export userschema
 const UserSchema = new mongoose.Schema(
   {
     fullName: {

@@ -16,7 +16,7 @@ router.put("/product", product.updateProduct);
 router.delete("/product", product.deleteProduct);
 router.get("/product/:productID", product.getProduct);
 router.get("/product", product.getProducts);
-router.get("/product/bygroup", product.getProductsByGroup);
+router.get("/product/bygroup/:groupID", product.getProductsByGroup);
 
 router.post("/group", group.addGroup);
 router.put("/group", group.updateGroup);
@@ -27,8 +27,8 @@ router.post("/shipment", shipment.addShipment);
 router.put("/shipment", shipment.updateShipment);
 router.delete("/shipment", shipment.deleteShipment);
 router.get("/shipment", shipment.getShipments);
-router.get("/shipment/bystatus", shipment.getShipmentsByStatus);
-router.get("/shipment/bytype", shipment.getShipmentsByType);
+router.get("/shipment/bystatus/:status", shipment.getShipmentsByStatus);
+router.get("/shipment/bytype/:type", shipment.getShipmentsByType);
 router.get("/shipment/:shipmentID", shipment.getShipment);
 
 module.exports = router;

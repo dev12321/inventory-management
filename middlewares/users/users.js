@@ -34,19 +34,28 @@ const registerUser = async ({ body }, res) => {
 const loginUser = (req, res) => {
   const { email, password } = req.body;
   req.body.username = email;
+
   passport.authenticate("local", (err, user, info) => {
+    console.log(err, user, info);
+
     if (err) {
-      res.json({ success: false, message: err });
+      res.json(500, {
+        success: false,
+        message: "Server Error"
+      });
     } else {
       if (!user) {
-        res.json({
+        res.json(400, {
           success: false,
-          message: "username or password incorrect"
+          message: "Email/Password is incorrect"
         });
       } else {
         req.login(user, err => {
           if (err) {
-            res.json({ success: false, message: err });
+            res.json(500, {
+              success: false,
+              message: "Server Error"
+            });
           } else {
             const token = jwt.sign(
               { userId: user._id, username: user.username },

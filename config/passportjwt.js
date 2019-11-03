@@ -15,12 +15,12 @@ passport.use(
   new JwtStrategy(opts, (jwt_payload, done) => {
     User.findOne({ email: jwt_payload.email }, (err, user) => {
       if (err) {
-        return done(err, false);
+        return done(err, null);
       }
       if (user) {
         return done(null, user);
       } else {
-        return done(null, false);
+        return done(null, null);
         // or you could create a new account
       }
     });
