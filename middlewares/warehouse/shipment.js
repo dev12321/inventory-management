@@ -6,9 +6,9 @@ require("../../models/shipment");
 require("../../models/user");
 const shipmentModel = mongoose.model("Shipment");
 
-const addShipment = async ({ body }, res) => {
-  const { products, status, type, user } = body;
-  if (user.role < 2) {
+const addShipment = async ({ body, user }, res) => {
+  const { products, status, type } = body;
+  if (user.role > 0) {
     const shipment = {
       products,
       status,
@@ -23,8 +23,8 @@ const addShipment = async ({ body }, res) => {
   }
 };
 
-const updateShipment = async ({ body }, res) => {
-  const { id, products, status, type, user } = body;
+const updateShipment = async ({ body, user }, res) => {
+  const { id, products, status, type } = body;
   const shipment = shipmentModel.findById(id);
   shipment.status = status;
 
@@ -32,9 +32,9 @@ const updateShipment = async ({ body }, res) => {
   res.status(200).json({ payload: shipment, msg: "success" });
 };
 
-const deleteShipment = async ({ body }, res) => {
-  const { id, user } = body;
-  if (user.role < 2) {
+const deleteShipment = async ({ body, user }, res) => {
+  const { id } = body;
+  if (user.role > 0) {
     const shipment = ShipmentModel.findByIdAndDelete(id);
     if (shipment) {
       res.status(200).json({ payload: shipment, msg: "success" });
@@ -57,8 +57,7 @@ const getShipments = async (req, res) => {
   else res.status(200).json({ err: "No Documents Found" });
 };
 
-const getShipment = async (req, res) => {
-  const { user } = req.body;
+const getShipment = async ({ user }, res) => {
   const shipment = await shipmentModel
     .findById(req.params.shipmentID)
     .populate();

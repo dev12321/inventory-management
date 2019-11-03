@@ -14,8 +14,9 @@ const registerUser = async ({ body }, res) => {
   const Users = new userModel({
     fullName,
     phone,
-    role: 2,
-    username: email
+    role: 0,
+    username: email,
+    isVerified: false
   });
 
   userModel.register(Users, password, (err, user) => {
@@ -49,6 +50,11 @@ const loginUser = (req, res) => {
           success: false,
           message: "Email/Password is incorrect"
         });
+      } else if (!user.isVerified) {
+        res.json(400, {
+          success: false,
+          message: "Your account is still under review"
+        });
       } else {
         req.login(user, err => {
           if (err) {
@@ -58,14 +64,25 @@ const loginUser = (req, res) => {
             });
           } else {
             const token = jwt.sign(
-              { userId: user._id, username: user.username },
+              {
+                userId: user._id,
+                email: user.username,
+                role: user.role,
+                fullName: user.fullName
+              },
               constants.JWT_SECRET,
               { expiresIn: "24h" }
             );
             res.json({
               success: true,
               message: "Authentication successfull",
-              token: token
+              token: token,
+              user: {
+                fullName: user.fullName,
+                email: user.username,
+                phone: user.phone,
+                role: user.role
+              }
             });
           }
         });

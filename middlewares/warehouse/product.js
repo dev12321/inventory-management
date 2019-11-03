@@ -5,7 +5,7 @@ const constants = require("../../utils/constants");
 require("../../models/product");
 const productModel = mongoose.model("Product");
 
-const addProduct = async ({ body }, res) => {
+const addProduct = async ({ body, user }, res) => {
   const {
     UPC,
     productName,
@@ -13,14 +13,16 @@ const addProduct = async ({ body }, res) => {
     quantity,
     manufacturingDate,
     expiryDate,
+    price,
     brand,
-    group,
-    user
+    group
   } = body;
-  if (user.role < 2) {
+
+  if (user.role > 0) {
     const product = {
       UPC,
       productName,
+      price,
       description,
       group,
       user: user._id
@@ -39,13 +41,15 @@ const addProduct = async ({ body }, res) => {
       product.brand = brand;
     }
     await new productModel(product).save();
+    console.log(product);
+
     res.status(200).json({ payload: product, msg: "success" });
   } else {
     res.status(403).json({ err: "Not Autherised" });
   }
 };
 
-const updateProduct = async ({ body }, res) => {
+const updateProduct = async ({ body, user }, res) => {
   const {
     id,
     UPC,
@@ -55,10 +59,9 @@ const updateProduct = async ({ body }, res) => {
     manufacturingDate,
     expiryDate,
     brand,
-    group,
-    user
+    group
   } = body;
-  if (user.role < 2) {
+  if (user.role > 0) {
     const product = await productModel.findById(id);
     // product.UPC = UPC;
     // product.productName = productName;
@@ -84,9 +87,9 @@ const updateProduct = async ({ body }, res) => {
   }
 };
 
-const deleteProduct = async ({ body }, res) => {
-  const { id, user } = body;
-  if (user.role < 2) {
+const deleteProduct = async ({ body, user }, res) => {
+  const { id } = body;
+  if (user.role > 0) {
     const product = await productModel.findByIdAndDelete(id);
 
     if (product) {
@@ -100,10 +103,12 @@ const deleteProduct = async ({ body }, res) => {
 };
 
 const getProducts = async (req, res) => {
+  const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+  const limit = req.query.limit ? parseInt(req.query.limit) : 0;
   const products = await productModel
     .find()
-    .skip(req.query.offset)
-    .limit(req.query.limit);
+    .skip(offset)
+    .limit(limit);
   if (products.length > 0)
     res.status(200).json({ payload: products, msg: "success" });
   else res.status(200).json({ err: "No Documents Found" });
@@ -116,10 +121,12 @@ const getProduct = async (req, res) => {
 };
 
 const getProductsByGroup = async (req, res) => {
+  const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+  const limit = req.query.limit ? parseInt(req.query.limit) : 0;
   const products = await productModel
     .find({ group: req.params.groupID })
-    .skip(req.query.offset)
-    .limit(req.query.limit);
+    .skip(offset)
+    .limit(limit);
   if (products.length > 0)
     res.status(200).json({ payload: products, msg: "success" });
   else res.status(200).json({ err: "No Documents Found" });

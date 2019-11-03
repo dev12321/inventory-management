@@ -5,9 +5,9 @@ const constants = require("../../utils/constants");
 require("../../models/group");
 const groupModel = mongoose.model("Group");
 
-const addGroup = async ({ body }, res) => {
-  const { groupName, parentGroup, user } = body;
-  if (user.role < 2) {
+const addGroup = async ({ body, user }, res) => {
+  const { groupName, parentGroup } = body;
+  if (user.role > 0) {
     const group = {
       groupName
     };
@@ -22,9 +22,9 @@ const addGroup = async ({ body }, res) => {
   }
 };
 
-const updateGroup = async ({ body }, res) => {
-  const { groupName, parentGroup, id, user } = body;
-  if (user.role < 2) {
+const updateGroup = async ({ body, user }, res) => {
+  const { groupName, parentGroup, id } = body;
+  if (user.role > 0) {
     const group = groupModel.findById(id);
     group.groupName = groupName;
 
@@ -39,9 +39,9 @@ const updateGroup = async ({ body }, res) => {
   }
 };
 
-const deleteGroup = async ({ body }, res) => {
-  const { id, user } = body;
-  if (user.role < 2) {
+const deleteGroup = async ({ body, user }, res) => {
+  const { id } = body;
+  if (user.role > 0) {
     const group = groupModel.findByIdAndDelete(id);
     if (group) {
       res.status(200).json({ payload: group, msg: "success" });
@@ -53,9 +53,8 @@ const deleteGroup = async ({ body }, res) => {
   }
 };
 
-const getGroups = async (req, res) => {
-  const { user } = req.body;
-  if (user.role < 2) {
+const getGroups = async ({ user }, res) => {
+  if (user.role > 0) {
     const groups = await groupModel.find();
     if (groups.length > 0)
       res.status(200).json({ payload: groups, msg: "success" });

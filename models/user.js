@@ -17,7 +17,8 @@ const UserSchema = new mongoose.Schema(
       match: [/\S+@\S+\.\S+/, "Email is invalid"]
     },
     phone: mongoose.SchemaTypes.Number,
-    role: mongoose.SchemaTypes.Number
+    role: mongoose.SchemaTypes.Number,
+    isVerified: mongoose.SchemaTypes.Boolean
   },
   { timestamps: true }
 );

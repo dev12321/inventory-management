@@ -21,6 +21,10 @@ const ProductSchema = new mongoose.Schema(
       type: mongoose.SchemaTypes.Number,
       default: 0
     },
+    price: {
+      type: mongoose.SchemaTypes.Number,
+      required: true
+    },
     manufacturingDate: {
       type: mongoose.SchemaTypes.Date
     },
