@@ -3,7 +3,7 @@ import { Route, Redirect } from "react-router-dom";
 import PropTypes from "prop-types";
 import jwt_decode from "jwt-decode";
 import { connect } from "react-redux";
-import * as loadingActions from "./../Loading/actions";
+import * as loadingActions from "./../../reducerActions/loading";
 import * as userActions from "./../../reducerActions/users";
 class RouteWithLayout extends Component {
   constructor(props) {
@@ -13,17 +13,19 @@ class RouteWithLayout extends Component {
     };
   }
   componentWillMount() {
-    if (this.props.authRequired) {
+    if (this.props.authRequired && !this.props.currentUser.email) {
       this.props.showLoading();
       const token = localStorage.getItem("IToken");
       if (token) {
         const decodedToken = jwt_decode(token);
-        if (decodedToken && decodedToken.email) {
+        if (decodedToken && decodedToken.username) {
           this.setState({ isAuth: true });
         }
-        this.props.loadUser(decodedToken);
+        this.props.loadUser({ ...decodedToken, email: decodedToken.username });
       }
       this.props.hideLoading();
+    } else {
+      this.setState({ isAuth: true });
     }
   }
 

@@ -18,7 +18,7 @@ import { Formik, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import CustomSnackbar from "./../../components/Snackbar";
-import * as loadingActions from "./../../components/Loading/actions";
+import * as loadingActions from "./../../reducerActions/loading";
 import { connect } from "react-redux";
 import * as actions from "./../../reducerActions/users";
 

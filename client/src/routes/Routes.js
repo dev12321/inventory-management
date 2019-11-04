@@ -6,7 +6,7 @@ import { RouteWithLayout } from "../components";
 import { Main as MainLayout, Minimal as MinimalLayout } from "../layouts";
 import {
   Dashboard as DashboardView,
-  //   ProductList as ProductListView,
+  ProductList as ProductListView,
   //   UserList as UserListView,
   //   Typography as TypographyView,
   //   Icons as IconsView,
@@ -30,21 +30,21 @@ const Routes = () => {
         layout={MainLayout}
         path="/dashboard"
       />
+
+      <RouteWithLayout
+        authRequired={true}
+        component={ProductListView}
+        exact
+        layout={MainLayout}
+        path="/products"
+      />
       {/* <RouteWithLayout
         authRequired={false}
         component={UserListView}
         exact
         layout={MainLayout}
         path="/users"
-      />
-      <RouteWithLayout
-        authRequired={false}
-        component={ProductListView}
-        exact
-        layout={MainLayout}
-        path="/products"
-      />
-      <RouteWithLayout
+      /><RouteWithLayout
         authRequired={false}
         component={TypographyView}
         exact

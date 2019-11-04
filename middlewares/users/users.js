@@ -37,7 +37,7 @@ const loginUser = (req, res) => {
   req.body.username = email;
 
   passport.authenticate("local", (err, user, info) => {
-    console.log(err, user, info);
+    // console.log(err, user, info);
 
     if (err) {
       res.json(500, {
@@ -66,7 +66,7 @@ const loginUser = (req, res) => {
             const token = jwt.sign(
               {
                 userId: user._id,
-                email: user.username,
+                username: user.username,
                 role: user.role,
                 fullName: user.fullName
               },

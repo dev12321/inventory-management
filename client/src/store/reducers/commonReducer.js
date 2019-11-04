@@ -7,10 +7,10 @@ import {
 } from "./../../utils/constants";
 
 const intitState = {
-  groupsList: {},
+  groupsList: [],
   currentUser: {},
-  productsList: {},
-  shipmentsList: {},
+  productsList: [],
+  shipmentsList: [],
   loading: false
 };
 

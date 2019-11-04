@@ -41,7 +41,7 @@ const addProduct = async ({ body, user }, res) => {
       product.brand = brand;
     }
     await new productModel(product).save();
-    console.log(product);
+    // console.log(product);
 
     res.status(200).json({ payload: product, msg: "success" });
   } else {
@@ -103,6 +103,7 @@ const deleteProduct = async ({ body, user }, res) => {
 };
 
 const getProducts = async (req, res) => {
+  // console.log(req);
   const offset = req.query.offset ? parseInt(req.query.offset) : 0;
   const limit = req.query.limit ? parseInt(req.query.limit) : 0;
   const products = await productModel
