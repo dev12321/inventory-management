@@ -3,7 +3,6 @@ import { Route, Redirect } from "react-router-dom";
 import PropTypes from "prop-types";
 import jwt_decode from "jwt-decode";
 import { connect } from "react-redux";
-import * as loadingActions from "./../../reducerActions/loading";
 import * as userActions from "./../../reducerActions/users";
 class RouteWithLayout extends Component {
   constructor(props) {
@@ -14,7 +13,6 @@ class RouteWithLayout extends Component {
   }
   componentWillMount() {
     if (this.props.authRequired && !this.props.currentUser.email) {
-      this.props.showLoading();
       const token = localStorage.getItem("IToken");
       if (token) {
         const decodedToken = jwt_decode(token);
@@ -23,7 +21,6 @@ class RouteWithLayout extends Component {
         }
         this.props.loadUser({ ...decodedToken, email: decodedToken.username });
       }
-      this.props.hideLoading();
     } else {
       this.setState({ isAuth: true });
     }
@@ -34,6 +31,8 @@ class RouteWithLayout extends Component {
       layout: Layout,
       component: Component,
       authRequired,
+      loadUser,
+      currentUser,
       ...rest
     } = this.props;
     // console.log(!authRequired, this.state.isAuth);
@@ -61,22 +60,12 @@ RouteWithLayout.propTypes = {
 };
 
 const mapStateToProps = state => {
-  // console.log("YOO STATE in Overview")
-  // console.log(state);
-  // console.log(state.firebase.profile);
   return {
-    currentUser: state.common.currentUser,
-    loading: state.common.loading
+    currentUser: state.common.currentUser
   };
 };
 
 const mapDispachToProps = (dispatch, props) => ({
-  showLoading: () => {
-    dispatch(loadingActions.showLoading());
-  },
-  hideLoading: () => {
-    dispatch(loadingActions.hideLoading());
-  },
   loadUser: user => {
     dispatch(userActions.loadUser(user));
   }

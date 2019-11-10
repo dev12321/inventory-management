@@ -39,11 +39,19 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Sidebar = props => {
-  const { open, variant, onClose, className, ...rest } = props;
+  const {
+    open,
+    variant,
+    onClose,
+    className,
+    currentUser,
+    dispatch,
+    ...rest
+  } = props;
 
   const classes = useStyles();
   const superAdminPages =
-    props.currentUser.role > 1
+    currentUser.role > 1
       ? [
           {
             title: "Users",

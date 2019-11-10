@@ -8,7 +8,7 @@ const ShipmentSchema = new mongoose.Schema(
   {
     products: [
       {
-        product: {
+        productID: {
           type: mongoose.SchemaTypes.ObjectId,
           ref: "Product",
           required: true

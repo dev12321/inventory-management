@@ -1,1 +1,1 @@
-export { loadProducts } from "./productActions";
+export { loadProducts, deleteProduct } from "./productActions";

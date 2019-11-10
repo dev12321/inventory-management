@@ -16,7 +16,6 @@ import NotificationsIcon from "@material-ui/icons/NotificationsOutlined";
 import InputIcon from "@material-ui/icons/Input";
 import { connect } from "react-redux";
 import * as userActions from "./../../../../reducerActions/users";
-import * as loadingActions from "./../../../../reducerActions/loading";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -31,19 +30,17 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Topbar = props => {
-  const { className, onSidebarOpen, ...rest } = props;
+  const { className, onSidebarOpen, loadUser, ...rest } = props;
 
   const classes = useStyles();
 
   const [notifications] = useState([]);
 
   const handleSignOut = () => {
-    props.showLoading();
     localStorage.clear();
     // console.log(props);
     props.history.push("/sign-in");
-    props.loadUser({});
-    props.hideLoading();
+    loadUser({});
   };
 
   return (
@@ -86,29 +83,19 @@ Topbar.propTypes = {
   onSidebarOpen: PropTypes.func
 };
 
-const mapStateToProps = state => {
-  // console.log("YOO STATE in Overview")
-  // console.log(state);
-  // console.log(state.firebase.profile);
-  return {
-    currentUser: state.common.currentUser,
-    loading: state.common.loading
-  };
-};
+// const mapStateToProps = state => {
+//   return {
+//     currentUser: state.common.currentUser
+//   };
+// };
 
 const mapDispachToProps = (dispatch, props) => ({
-  showLoading: () => {
-    dispatch(loadingActions.showLoading());
-  },
-  hideLoading: () => {
-    dispatch(loadingActions.hideLoading());
-  },
   loadUser: user => {
     dispatch(userActions.loadUser(user));
   }
 });
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispachToProps
 )(Topbar);
