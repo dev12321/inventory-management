@@ -16,7 +16,7 @@ const addGroup = async ({ body, user }, res) => {
     }
 
     await new groupModel(group).save();
-    res.status(200).json({ payload: group, msg: "success" });
+    res.status(200).json({ payload: group, message: "success" });
   } else {
     res.status(403).json({ err: "Not Autherised" });
   }
@@ -33,7 +33,7 @@ const updateGroup = async ({ body, user }, res) => {
     }
 
     await group.save();
-    res.status(200).json({ payload: group, msg: "success" });
+    res.status(200).json({ payload: group, message: "success" });
   } else {
     res.status(403).json({ err: "Not Autherised" });
   }
@@ -44,7 +44,7 @@ const deleteGroup = async ({ body, user }, res) => {
   if (user.role > 0) {
     const group = groupModel.findByIdAndDelete(id);
     if (group) {
-      res.status(200).json({ payload: group, msg: "success" });
+      res.status(200).json({ payload: group, message: "success" });
     } else {
       res.status(200).json({ err: "group not found" });
     }
@@ -57,7 +57,7 @@ const getGroups = async ({ user }, res) => {
   if (user.role > 0) {
     const groups = await groupModel.find();
     if (groups.length > 0)
-      res.status(200).json({ payload: groups, msg: "success" });
+      res.status(200).json({ payload: groups, message: "success" });
     else res.status(200).json({ err: "No Documents Found" });
   } else {
     res.status(403).json({ err: "Not Autherised" });

@@ -43,7 +43,7 @@ const addProduct = async ({ body, user }, res) => {
     await new productModel(product).save();
     // console.log(product);
 
-    res.status(200).json({ payload: product, msg: "success" });
+    res.status(200).json({ payload: product, message: "success" });
   } else {
     res.status(403).json({ err: "Not Autherised" });
   }
@@ -81,7 +81,7 @@ const updateProduct = async ({ body, user }, res) => {
     // product.brand = brand;
     // }
     await product.save();
-    res.status(200).json({ payload: product, msg: "success" });
+    res.status(200).json({ payload: product, message: "success" });
   } else {
     res.status(403).json({ err: "Not Autherised" });
   }
@@ -93,7 +93,7 @@ const deleteProduct = async ({ body, user }, res) => {
     const product = await productModel.findByIdAndDelete(id);
 
     if (product) {
-      res.status(200).json({ payload: product, msg: "success" });
+      res.status(200).json({ payload: product, message: "success" });
     } else {
       res.status(200).json({ err: "product not found" });
     }
@@ -111,13 +111,13 @@ const getProducts = async (req, res) => {
     .skip(offset)
     .limit(limit);
   if (products.length > 0)
-    res.status(200).json({ payload: products, msg: "success" });
+    res.status(200).json({ payload: products, message: "success" });
   else res.status(200).json({ err: "No Documents Found" });
 };
 
 const getProduct = async (req, res) => {
   const products = await productModel.findById(req.params.productID);
-  if (products) res.status(200).json({ payload: product, msg: "success" });
+  if (products) res.status(200).json({ payload: product, message: "success" });
   else res.status(200).json({ err: "No Document Found" });
 };
 
@@ -129,7 +129,7 @@ const getProductsByGroup = async (req, res) => {
     .skip(offset)
     .limit(limit);
   if (products.length > 0)
-    res.status(200).json({ payload: products, msg: "success" });
+    res.status(200).json({ payload: products, message: "success" });
   else res.status(200).json({ err: "No Documents Found" });
 };
 

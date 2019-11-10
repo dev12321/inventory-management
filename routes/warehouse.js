@@ -24,7 +24,7 @@ router.delete("/group", group.deleteGroup);
 router.get("/group", group.getGroups);
 
 router.post("/shipment", shipment.addShipment);
-router.put("/shipment", shipment.updateShipment);
+router.put("/shipment/:shipmentID", shipment.updateShipment);
 router.delete("/shipment", shipment.deleteShipment);
 router.get("/shipment", shipment.getShipments);
 router.get("/shipment/bystatus/:status", shipment.getShipmentsByStatus);

@@ -74,9 +74,28 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 function ShipmentDialog(props) {
   const classes = useStyles();
   const [isSubmiting, setIsSubmiting] = useState(false);
+  const [snackbarDetails, setSnackbarDetails] = useState({
+    message: "",
+    variant: "success",
+    open: false
+  });
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setSnackbarDetails({ ...snackbarDetails, open: false });
+  };
 
   return (
     <div>
+      <CustomSnackbar
+        onClose={handleClose}
+        open={snackbarDetails.open}
+        message={snackbarDetails.message}
+        variant={snackbarDetails.variant}
+      />
       <Dialog
         fullScreen
         open={props.open}
@@ -97,12 +116,11 @@ function ShipmentDialog(props) {
               Shipment
             </Typography>
             {isSubmiting ? (
-              <CircularProgress color="secondary" />
+              <CircularProgress style={{ color: "white" }} />
             ) : (
               <Button
                 autoFocus
                 color="inherit"
-                // onClick={props.handleClose}
                 type="submit"
                 form="add-to-shipment"
               >
@@ -121,40 +139,61 @@ function ShipmentDialog(props) {
         <Formik
           initialValues={{
             products: props.data,
-            type: 0
+            type: 0,
+            name: "",
+            description: ""
           }}
           onSubmit={values => {
             console.log(values);
             props.showLoading();
             setIsSubmiting(true);
-            setTimeout(() => {
-              props.hideLoading();
-              setIsSubmiting(false);
-            }, 1000);
+            // setTimeout(() => {
+            //   props.hideLoading();
+            //   setIsSubmiting(false);
+            // }, 1000);
+            const finalData = {
+              products: values.products.map(prod => {
+                return {
+                  product: prod.product,
+                  quantity: prod.quantity
+                };
+              }),
+              type: values.type,
+              name: values.name,
+              description: values.description
+            };
 
-            // props.showLoading();
-            // axios
-            //   .post("/api/users/login", values)
-            //   .then(res => {
-            //     props.hideLoading();
-            //     console.log(res.data);
-            //     props.loadCurrentUser(res.data.user);
-            //     setSnackbarDetails({
-            //       message: res.data.message,
-            //       variant: "success",
-            //       open: true
-            //     });
-            //     localStorage.setItem("IToken", res.data.token);
-            //     props.history.push("/");
-            //   })
-            //   .catch(err => {
-            //     props.hideLoading();
-            //     setSnackbarDetails({
-            //       message: err.response.data.message,
-            //       variant: "error",
-            //       open: true
-            //     });
-            //   });
+            const token = localStorage.getItem("IToken");
+            axios({
+              url: "/api/warehouse/shipment",
+              method: "POST",
+              data: finalData,
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token
+              }
+            })
+              .then(res => {
+                props.hideLoading();
+                console.log(res.data);
+                setSnackbarDetails({
+                  message: res.data.message,
+                  variant: "success",
+                  open: true
+                });
+                props.loadAllProducts();
+                props.handleClose();
+                setIsSubmiting(false);
+              })
+              .catch(err => {
+                setIsSubmiting(false);
+                props.hideLoading();
+                setSnackbarDetails({
+                  message: err.response.data.message,
+                  variant: "error",
+                  open: true
+                });
+              });
           }}
           validationSchema={Yup.object().shape({
             products: Yup.array().of(
@@ -168,7 +207,9 @@ function ShipmentDialog(props) {
                   .required("Quantity is required")
               })
             ),
-            type: Yup.number().required("Type is Required")
+            type: Yup.number().required("Type is Required"),
+            name: Yup.string().required("Name is Required"),
+            description: Yup.string().required("Description is Required")
           })}
           validateOnChange
           render={({
@@ -186,22 +227,74 @@ function ShipmentDialog(props) {
               method="POST"
               style={{ marginTop: "40px", padding: "50px" }}
             >
-              <FormControl variant="outlined" style={{ width: "20%" }}>
-                <InputLabel
-                // ref={inputLabel}
-                >
-                  Shipment Type
-                </InputLabel>
-                <Select
-                  value={values.type}
-                  onChange={handleChange}
-                  name="type"
-                  // labelWidth={labelWidth}
-                >
-                  <MenuItem value={0}>Incoming</MenuItem>
-                  <MenuItem value={1}>Outgoing</MenuItem>
-                </Select>
-              </FormControl>
+              <Grid container style={{ width: "100%" }}>
+                <Grid container direction="row" spacing xs={2}>
+                  <Grid item xs={6}>
+                    <TextField
+                      id="outlined-basic"
+                      // className={classes.textField}
+                      label="Shipment Name"
+                      margin="normal"
+                      variant="outlined"
+                      name="name"
+                      value={values.name}
+                      onChange={handleChange}
+                    />
+                    <ErrorMessage
+                      name={`name`}
+                      render={message => (
+                        <Typography
+                          variant="subtitle2"
+                          style={{ color: "red" }}
+                        >
+                          {message}
+                        </Typography>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormControl variant="outlined">
+                      <InputLabel
+                      // ref={inputLabel}
+                      >
+                        Shipment Type
+                      </InputLabel>
+                      <Select
+                        value={values.type}
+                        onChange={handleChange}
+                        name="type"
+                        // labelWidth={labelWidth}
+                      >
+                        <MenuItem value={0}>Incoming</MenuItem>
+                        <MenuItem value={1}>Outgoing</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    id="outlined-multiline-static"
+                    label="Description"
+                    multiline
+                    name="description"
+                    rows="4"
+                    defaultValue="Default Value"
+                    value={values.description}
+                    onChange={handleChange}
+                    margin="normal"
+                    variant="outlined"
+                  />
+                  <ErrorMessage
+                    name={`description`}
+                    render={message => (
+                      <Typography variant="subtitle2" style={{ color: "red" }}>
+                        {message}
+                      </Typography>
+                    )}
+                  />
+                </Grid>
+              </Grid>
+
               <FieldArray
                 name="products"
                 render={({
@@ -240,12 +333,12 @@ function ShipmentDialog(props) {
                               />
                               <ErrorMessage
                                 name={`products[${index}].quantity`}
-                                render={msg => (
+                                render={message => (
                                   <Typography
                                     variant="subtitle2"
                                     style={{ color: "red" }}
                                   >
-                                    {msg}
+                                    {message}
                                   </Typography>
                                 )}
                               />
@@ -289,9 +382,9 @@ function ShipmentDialog(props) {
               <div>
                 <ErrorMessage
                   name="status"
-                  render={msg => (
+                  render={message => (
                     <Typography variant="subtitle2" style={{ color: "red" }}>
-                      {msg}
+                      {message}
                     </Typography>
                   )}
                 />
@@ -312,9 +405,9 @@ function ShipmentDialog(props) {
               <div>
                 <ErrorMessage
                   name="type"
-                  render={msg => (
+                  render={message => (
                     <Typography variant="subtitle2" style={{ color: "red" }}>
-                      {msg}
+                      {message}
                     </Typography>
                   )}
                 />
@@ -358,8 +451,8 @@ const mapDispachToProps = (dispatch, props) => ({
   hideLoading: () => {
     dispatch(loadingActions.hideLoading());
   },
-  loadAllProducts: products => {
-    dispatch(productActions.loadProducts(products));
+  loadAllProducts: () => {
+    dispatch(productActions.loadProducts());
   },
   deleteProduct: product => {
     dispatch(productActions.deleteProduct(product));

@@ -159,9 +159,9 @@ function SignIn(props) {
               <div>
                 <ErrorMessage
                   name="email"
-                  render={msg => (
+                  render={message => (
                     <Typography variant="subtitle2" style={{ color: "red" }}>
-                      {msg}
+                      {message}
                     </Typography>
                   )}
                 />
@@ -182,9 +182,9 @@ function SignIn(props) {
               <div>
                 <ErrorMessage
                   name="password"
-                  render={msg => (
+                  render={message => (
                     <Typography variant="subtitle2" style={{ color: "red" }}>
-                      {msg}
+                      {message}
                     </Typography>
                   )}
                 />

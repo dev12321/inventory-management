@@ -11,7 +11,7 @@ import {
   //   Typography as TypographyView,
   //   Icons as IconsView,
   //   Account as AccountView,
-  //   Settings as SettingsView,
+  ShipmentList as ShipmentListView,
   SignUp as SignUpView,
   SignIn as SignInView,
   NotFound as NotFoundView,
@@ -37,6 +37,13 @@ const Routes = () => {
         exact
         layout={MainLayout}
         path="/products"
+      />
+      <RouteWithLayout
+        authRequired={true}
+        component={ShipmentListView}
+        exact
+        layout={MainLayout}
+        path="/shipments"
       />
       {/* <RouteWithLayout
         authRequired={false}

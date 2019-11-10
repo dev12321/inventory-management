@@ -4,20 +4,39 @@ const constants = require("../../utils/constants");
 
 require("../../models/shipment");
 require("../../models/user");
-const shipmentModel = mongoose.model("Shipment");
+const ShipmentModel = mongoose.model("Shipment");
+const ProductModel = mongoose.model("Product");
 
 const addShipment = async ({ body, user }, res) => {
-  const { products, status } = body;
+  const { products, type, name, description } = body;
+  console.log(user);
+  console.log(name, description);
   if (user.role > 0) {
     const shipment = {
       products,
-      status,
-      type: 0,
+      type,
+      name,
+      description,
+      status: 0,
       user: user._id
     };
-
-    await new shipmentModel(shipment).save();
-    res.status(200).json({ payload: shipment, msg: "success" });
+    if (type === 1) {
+      const bulkWriteRes = await ProductModel.bulkWrite(
+        products.map(prod => {
+          return {
+            updateOne: {
+              filter: { _id: prod.product },
+              update: { $inc: { quantity: -1 * prod.quantity } }
+            }
+          };
+        })
+      );
+      console.log(bulkWriteRes);
+    }
+    await new ShipmentModel(shipment).save();
+    res
+      .status(200)
+      .json({ payload: shipment, message: "Shipment succesfully added" });
   } else {
     res.status(403).json({ err: "Not Autherised" });
   }
@@ -25,11 +44,11 @@ const addShipment = async ({ body, user }, res) => {
 
 const updateShipment = async ({ body, user }, res) => {
   const { id, products, status, type } = body;
-  const shipment = shipmentModel.findById(id);
+  const shipment = ShipmentModel.findById(id);
   shipment.status = status;
 
   await shipment.save();
-  res.status(200).json({ payload: shipment, msg: "success" });
+  res.status(200).json({ payload: shipment, message: "success" });
 };
 
 const deleteShipment = async ({ body, user }, res) => {
@@ -37,7 +56,7 @@ const deleteShipment = async ({ body, user }, res) => {
   if (user.role > 0) {
     const shipment = ShipmentModel.findByIdAndDelete(id);
     if (shipment) {
-      res.status(200).json({ payload: shipment, msg: "success" });
+      res.status(200).json({ payload: shipment, message: "success" });
     } else {
       res.status(200).json({ err: "shipment not found" });
     }
@@ -47,42 +66,39 @@ const deleteShipment = async ({ body, user }, res) => {
 };
 
 const getShipments = async (req, res) => {
-  const shipments = await shipmentModel
-    .find()
+  const shipments = await ShipmentModel.find()
     .skip(req.query.offset)
     .limit(req.query.limit)
     .populate();
   if (shipments.length > 0)
-    res.status(200).json({ payload: shipments, msg: "success" });
+    res.status(200).json({ payload: shipments, message: "success" });
   else res.status(200).json({ err: "No Documents Found" });
 };
 
 const getShipment = async ({ user }, res) => {
-  const shipment = await shipmentModel
-    .findById(req.params.shipmentID)
-    .populate();
-  if (shipment) res.status(200).json({ payload: shipment, msg: "success" });
+  const shipment = await ShipmentModel.findById(
+    req.params.shipmentID
+  ).populate();
+  if (shipment) res.status(200).json({ payload: shipment, message: "success" });
   else res.status(200).json({ err: "No Document Found" });
 };
 
 const getShipmentsByStatus = async (req, res) => {
-  const shipments = await shipmentModel
-    .find({ status: req.params.status })
+  const shipments = await ShipmentModel.find({ status: req.params.status })
     .skip(req.query.offset)
     .limit(req.query.limit)
     .populate();
   if (shipments.length > 0)
-    res.status(200).json({ payload: shipments, msg: "success" });
+    res.status(200).json({ payload: shipments, message: "success" });
   else res.status(200).json({ err: "No Documents Found" });
 };
 const getShipmentsByType = async (req, res) => {
-  const shipments = await shipmentModel
-    .find({ type: req.params.type })
+  const shipments = await ShipmentModel.find({ type: req.params.type })
     .skip(req.query.offset)
     .limit(req.query.limit)
     .populate();
   if (shipments.length > 0)
-    res.status(200).json({ payload: shipments, msg: "success" });
+    res.status(200).json({ payload: shipments, message: "success" });
   else res.status(200).json({ err: "No Documents Found" });
 };
 

@@ -96,7 +96,7 @@ const removeUser = ({ body }, res) => {
   if (user.role < 1) {
     const user = userModel.findByIdAndDelete(id);
     if (user) {
-      res.status(200).json({ payload: user, msg: "success" });
+      res.status(200).json({ payload: user, message: "success" });
     } else {
       res.status(200).json({ err: "user not found" });
     }

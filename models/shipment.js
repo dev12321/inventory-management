@@ -23,6 +23,14 @@ const ShipmentSchema = new mongoose.Schema(
       type: mongoose.SchemaTypes.Number,
       required: [true, "Specify the status"]
     },
+    name: {
+      type: mongoose.SchemaTypes.String,
+      required: [true, "Specify the Name"]
+    },
+    description: {
+      type: mongoose.SchemaTypes.String,
+      required: [true, "Specify the description"]
+    },
     type: {
       type: mongoose.SchemaTypes.Number,
       required: [true, "Specify the type"]

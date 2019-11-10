@@ -1,25 +1,25 @@
-import { LOAD_ALL_PRODUCTS, UPDATE_LOADING } from "../../utils/constants";
+import { LOAD_ALL_SHIPMENTS, UPDATE_LOADING } from "../../utils/constants";
 import axios from "axios";
-import * as groupActions from "./../../reducerActions/groups";
-import * as loadingActions from "./../../reducerActions/loading";
+import * as groupActions from "../groups";
+import * as loadingActions from "../loading";
 
-export const loadProducts = () => {
+export const loadShipments = () => {
   return (dispatch, getState) => {
     const state = getState();
     const token = localStorage.getItem("IToken");
     dispatch(loadingActions.showLoading());
     axios
-      .get("/api/warehouse/product", {
+      .get("/api/warehouse/shipment", {
         method: "get",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + token
         }
       })
-      .then(productRes => {
+      .then(shipmentRes => {
         dispatch({
-          type: LOAD_ALL_PRODUCTS,
-          payload: productRes.data.payload
+          type: LOAD_ALL_SHIPMENTS,
+          payload: shipmentRes.data.payload
         });
         if (state.common.groupsList.length === 0) {
           dispatch(groupActions.loadGroups());
@@ -34,21 +34,21 @@ export const loadProducts = () => {
   };
 };
 
-export const deleteProduct = product => {
+export const deleteShipment = shipment => {
   return dispatch => {
     const token = localStorage.getItem("IToken");
     dispatch(loadingActions.showLoading());
     axios
-      .delete("/api/warehouse/product", {
+      .delete("/api/warehouse/shipment", {
         method: "post",
-        data: { id: product._id },
+        data: { id: shipment._id },
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + token
         }
       })
       .then(res => {
-        dispatch(loadProducts());
+        dispatch(loadShipments());
       })
       .catch(err => {
         console.log(err);
