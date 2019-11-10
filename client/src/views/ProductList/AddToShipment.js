@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import * as productActions from "./../../reducerActions/products";
 import * as loadingActions from "./../../reducerActions/loading";
@@ -20,44 +20,48 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Table,
+  TableHead,
+  TableBody,
+  TableCell,
+  TableRow,
+  Paper,
+  CircularProgress
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { connect } from "react-redux";
 import NumberFormat from "react-number-format";
 import { Link } from "react-router-dom";
-import { Formik, ErrorMessage, FieldArray } from "formik";
+import { Formik, ErrorMessage, FieldArray, Field } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import CustomSnackbar from "./../../components/Snackbar";
 
 const useStyles = makeStyles(theme => ({
   appBar: {
-    position: "relative"
+    position: "fixed"
   },
   title: {
     marginLeft: theme.spacing(2),
     flex: 1
+  },
+  paper: {
+    marginTop: "10px"
   }
 }));
 
 function NumberFormatCustom(props) {
-  const { inputRef, onChange, ...other } = props;
+  const { field, form, ...other } = props;
 
   return (
     <NumberFormat
       {...other}
-      getInputRef={inputRef}
-      onValueChange={values => {
-        onChange({
-          target: {
-            value: values.value
-          }
-        });
-      }}
+      {...field}
       //   thousandSeparator
       //   thousandsGroupStyle="lakh"
-      isNumericString
+      // isNumericString
+      decimalScale={0}
       //   prefix="$"
     />
   );
@@ -69,6 +73,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 function ShipmentDialog(props) {
   const classes = useStyles();
+  const [isSubmiting, setIsSubmiting] = useState(false);
 
   return (
     <div>
@@ -91,47 +96,42 @@ function ShipmentDialog(props) {
             <Typography variant="h6" className={classes.title}>
               Shipment
             </Typography>
-            <Button
-              autoFocus
-              color="inherit"
-              onClick={props.handleClose}
-              type="submit"
-              form="add-to-shipment"
-            >
-              Add
-            </Button>
+            {isSubmiting ? (
+              <CircularProgress color="secondary" />
+            ) : (
+              <Button
+                autoFocus
+                color="inherit"
+                // onClick={props.handleClose}
+                type="submit"
+                form="add-to-shipment"
+              >
+                {` Add`}
+              </Button>
+            )}
           </Toolbar>
         </AppBar>
-        <Formik onSubmit />
-        <TextField
-          //   className={classes.formControl}
-          label="react-number-format"
+        {/* <TextField
           //   value={values.numberformat}
           //   onChange={handleChange("numberformat")}
-          id="formatted-numberformat-input"
           InputProps={{
             inputComponent: NumberFormatCustom
           }}
-        />
-        {/* <List>
-           <ListItem button>
-            <ListItemText primary="Phone ringtone" secondary="Titania" />
-          </ListItem>
-          <Divider />
-          <ListItem button>
-            <ListItemText
-              primary="Default notification ringtone"
-              secondary="Tethys"
-            />
-          </ListItem> 
-        </List>*/}
+        /> */}
         <Formik
           initialValues={{
-            products: [],
-            status: 0,
+            products: props.data,
             type: 0
           }}
           onSubmit={values => {
+            console.log(values);
+            props.showLoading();
+            setIsSubmiting(true);
+            setTimeout(() => {
+              props.hideLoading();
+              setIsSubmiting(false);
+            }, 1000);
+
             // props.showLoading();
             // axios
             //   .post("/api/users/login", values)
@@ -159,17 +159,18 @@ function ShipmentDialog(props) {
           validationSchema={Yup.object().shape({
             products: Yup.array().of(
               Yup.object().shape({
-                productID: Yup.string().required("Product ID is required"),
+                product: Yup.string(),
                 quantity: Yup.number()
-                  .when("$productID", (value, schema) => {
-                    const product = props.data.find(el => el._id === value);
-                    return schema.max(product.quantity);
+                  .when("maxQuantity", (value, schema) => {
+                    // console.log(value);
+                    return schema.max(value ? value : 0);
                   })
                   .required("Quantity is required")
               })
             ),
-            status: Yup.number().required("Status is Required")
+            type: Yup.number().required("Type is Required")
           })}
+          validateOnChange
           render={({
             values,
             errors,
@@ -180,20 +181,21 @@ function ShipmentDialog(props) {
           }) => (
             <form
               id={"add-to-shipment"}
-              className={classes.form}
               noValidate
               onSubmit={handleSubmit}
               method="POST"
+              style={{ marginTop: "40px", padding: "50px" }}
             >
-              <FormControl variant="outlined" className={classes.formControl}>
+              <FormControl variant="outlined" style={{ width: "20%" }}>
                 <InputLabel
                 // ref={inputLabel}
                 >
-                  Age
+                  Shipment Type
                 </InputLabel>
                 <Select
                   value={values.type}
                   onChange={handleChange}
+                  name="type"
                   // labelWidth={labelWidth}
                 >
                   <MenuItem value={0}>Incoming</MenuItem>
@@ -202,11 +204,74 @@ function ShipmentDialog(props) {
               </FormControl>
               <FieldArray
                 name="products"
-                render={({ move, swap, push, insert, unshift, pop }) =>
-                  values.products.map(product => {
-                    return <TextField name={product._id} />;
-                  })
-                }
+                render={({
+                  move,
+                  swap,
+                  push,
+                  insert,
+                  unshift,
+                  pop,
+                  remove
+                }) => (
+                  <Paper className={classes.paper}>
+                    <Table
+                      // className={classes.table}
+                      aria-label="simple table"
+                    >
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Product Name</TableCell>
+                          <TableCell>Quantity</TableCell>
+                          <TableCell>Remove</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {values.products.map((product, index) => (
+                          <TableRow key={product._id}>
+                            <Field name={`products[${index}]._id`} hidden />
+                            <TableCell component="th" scope="row">
+                              {product.productName}
+                            </TableCell>
+                            <TableCell>
+                              <Field
+                                type="number"
+                                name={`products[${index}].quantity`}
+                                component={NumberFormatCustom}
+                              />
+                              <ErrorMessage
+                                name={`products[${index}].quantity`}
+                                render={msg => (
+                                  <Typography
+                                    variant="subtitle2"
+                                    style={{ color: "red" }}
+                                  >
+                                    {msg}
+                                  </Typography>
+                                )}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Button onClick={() => remove(index)}>
+                                {" "}
+                                Remove Item
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {/* {rows.map(row => (
+                                <TableCell align="right">
+                                  {row.calories}
+                                </TableCell>
+                                <TableCell align="right">{row.fat}</TableCell>
+                                <TableCell align="right">{row.carbs}</TableCell>
+                                <TableCell align="right">
+                                  {row.protein}
+                                </TableCell>
+                            ))} */}
+                      </TableBody>
+                    </Table>
+                  </Paper>
+                )}
               />
               {/* 
               <TextField

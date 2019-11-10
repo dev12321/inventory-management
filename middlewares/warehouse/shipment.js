@@ -7,12 +7,12 @@ require("../../models/user");
 const shipmentModel = mongoose.model("Shipment");
 
 const addShipment = async ({ body, user }, res) => {
-  const { products, status, type } = body;
+  const { products, status } = body;
   if (user.role > 0) {
     const shipment = {
       products,
       status,
-      type,
+      type: 0,
       user: user._id
     };
 

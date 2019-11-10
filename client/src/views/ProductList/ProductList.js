@@ -19,7 +19,7 @@ class ProductList extends Component {
     this.state = {
       selectedProducts: [],
       isLoaded: false,
-      selection: false,
+      selection: true,
       dialogOpen: false
     };
   }
@@ -121,7 +121,18 @@ class ProductList extends Component {
           open={this.state.dialogOpen}
           handleOpen={this.handleDialogOpen}
           handleClose={this.handleDialogClose}
-          data={this.state.selectedProducts}
+          data={
+            this.state.selectedProducts
+              ? this.state.selectedProducts.map(prod => {
+                  return {
+                    product: prod._id,
+                    productName: prod.productName,
+                    quantity: prod.quantity,
+                    maxQuantity: prod.quantity
+                  };
+                })
+              : []
+          }
         />
         <Paper
           style={{
@@ -166,7 +177,7 @@ class ProductList extends Component {
                             selectedProducts: data,
                             dialogOpen: true
                           });
-                          alert("You want to delete " + data.length + " rows");
+                          // alert("You want to delete " + data.length + " rows");
                           console.log(data);
                         }
                       }
