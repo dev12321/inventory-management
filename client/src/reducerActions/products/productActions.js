@@ -55,3 +55,51 @@ export const deleteProduct = product => {
       });
   };
 };
+
+export const updateProduct = (product, resolve) => {
+  return dispatch => {
+    const token = localStorage.getItem("IToken");
+    dispatch(loadingActions.showLoading());
+    axios({
+      url: "/api/warehouse/product",
+      method: "PUT",
+      data: product,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token
+      }
+    })
+      .then(res => {
+        dispatch(loadProducts());
+
+        resolve();
+      })
+      .catch(err => {
+        console.log(err);
+        dispatch(loadingActions.hideLoading());
+        resolve();
+      });
+  };
+};
+export const addProduct = product => {
+  return dispatch => {
+    const token = localStorage.getItem("IToken");
+    dispatch(loadingActions.showLoading());
+    axios({
+      url: "/api/warehouse/product",
+      method: "POST",
+      data: product,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token
+      }
+    })
+      .then(res => {
+        dispatch(loadProducts());
+      })
+      .catch(err => {
+        console.log(err);
+        dispatch(loadingActions.hideLoading());
+      });
+  };
+};

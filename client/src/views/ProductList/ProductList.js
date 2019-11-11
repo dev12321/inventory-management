@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { Paper, Switch, FormControlLabel } from "@material-ui/core";
+import {
+  Paper,
+  Switch,
+  FormControlLabel,
+  TextField,
+  Button
+} from "@material-ui/core";
 import axios from "axios";
 import MaterialTable, { MTableToolbar } from "material-table";
 import { connect } from "react-redux";
@@ -12,6 +18,29 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker
 } from "@material-ui/pickers";
+import NumberFormat from "react-number-format";
+import { LOAD_ALL_PRODUCTS } from "../../utils/constants";
+import { Link } from "react-router-dom";
+
+function NumberFormatCustom(props) {
+  const { inputRef, onChange, ...other } = props;
+
+  return (
+    <NumberFormat
+      {...other}
+      getInputRef={inputRef}
+      onValueChange={values => {
+        onChange({
+          value: values.value
+        });
+      }}
+      decimalScale={0}
+      // thousandSeparator
+      // isNumericString
+      //   thousandsGroupStyle="lakh"
+    />
+  );
+}
 
 class ProductList extends Component {
   constructor(props) {
@@ -19,7 +48,7 @@ class ProductList extends Component {
     this.state = {
       selectedProducts: [],
       isLoaded: false,
-      selection: true,
+      selection: false,
       dialogOpen: false
     };
   }
@@ -67,8 +96,54 @@ class ProductList extends Component {
         // render: data => data.description.slice(0, 100) + "..."
       },
       { field: "brand", title: "Brand" },
-      { field: "price", title: "Price" },
-      { field: "quantity", title: "Quantity" },
+      {
+        field: "price",
+        title: "Price",
+        editComponent: props => {
+          return (
+            <TextField
+              id="outlined-basic"
+              // className={classes.textField}
+              label="Quantity"
+              margin="normal"
+              // variant="outlined"
+              name="quantity"
+              value={props.value}
+              onChange={target => {
+                console.log(target);
+                props.onChange(parseInt(target.value));
+              }}
+              InputProps={{
+                inputComponent: NumberFormatCustom
+              }}
+            />
+          );
+        }
+      },
+      {
+        field: "quantity",
+        title: "Quantity",
+        editComponent: props => {
+          return (
+            <TextField
+              id="outlined-basic"
+              // className={classes.textField}
+              label="Quantity"
+              margin="normal"
+              // variant="outlined"
+              name="quantity"
+              value={props.value}
+              onChange={target => {
+                console.log(target);
+                props.onChange(parseInt(target.value));
+              }}
+              InputProps={{
+                inputComponent: NumberFormatCustom
+              }}
+            />
+          );
+        }
+      },
       {
         field: "manufacturingDate",
         title: "MFD",
@@ -127,7 +202,7 @@ class ProductList extends Component {
                   return {
                     product: prod._id,
                     productName: prod.productName,
-                    quantity: prod.quantity,
+                    quantity: 1,
                     maxQuantity: prod.quantity
                   };
                 })
@@ -154,8 +229,9 @@ class ProductList extends Component {
                   ? {
                       onRowUpdate: (newData, oldData) =>
                         new Promise(resolve => {
-                          resolve();
-                          if (oldData) {
+                          // resolve();
+                          if (newData) {
+                            this.props.updateProduct(newData, resolve);
                           }
                         }),
                       onRowDelete: oldData =>
@@ -199,6 +275,9 @@ class ProductList extends Component {
                       }
                       label="Toggle Selection"
                     />
+                    <Link to="/add-product">
+                      <Button>Add Product</Button>
+                    </Link>
                   </div>
                 )
               }}
@@ -229,6 +308,9 @@ const mapDispachToProps = (dispatch, props) => ({
   },
   deleteProduct: product => {
     dispatch(productActions.deleteProduct(product));
+  },
+  updateProduct: (product, resolve) => {
+    dispatch(productActions.updateProduct(product, resolve));
   }
 });
 

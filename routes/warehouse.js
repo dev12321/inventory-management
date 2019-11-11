@@ -24,11 +24,11 @@ router.delete("/group", group.deleteGroup);
 router.get("/group", group.getGroups);
 
 router.post("/shipment", shipment.addShipment);
-router.put("/shipment/:shipmentID", shipment.updateShipment);
+router.put("/shipment", shipment.updateShipment);
 router.delete("/shipment", shipment.deleteShipment);
 router.get("/shipment", shipment.getShipments);
-router.get("/shipment/bystatus/:status", shipment.getShipmentsByStatus);
-router.get("/shipment/bytype/:type", shipment.getShipmentsByType);
+router.get("/shipment/bystatus/:shipmentStatus", shipment.getShipmentsByStatus);
+router.get("/shipment/bytype/:shipmentType", shipment.getShipmentsByType);
 router.get("/shipment/:shipmentID", shipment.getShipment);
 
 module.exports = router;

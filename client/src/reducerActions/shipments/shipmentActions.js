@@ -2,6 +2,7 @@ import { LOAD_ALL_SHIPMENTS, UPDATE_LOADING } from "../../utils/constants";
 import axios from "axios";
 import * as groupActions from "../groups";
 import * as loadingActions from "../loading";
+import * as productActions from "../products";
 
 export const loadShipments = () => {
   return (dispatch, getState) => {
@@ -51,6 +52,31 @@ export const deleteShipment = shipment => {
         dispatch(loadShipments());
       })
       .catch(err => {
+        console.log(err);
+      });
+  };
+};
+
+export const updateShipment = (type, shipment) => {
+  return dispatch => {
+    const token = localStorage.getItem("IToken");
+    dispatch(loadingActions.showLoading());
+    axios({
+      url: "/api/warehouse/shipment",
+      method: "PUT",
+      data: { id: shipment._id, type },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token
+      }
+    })
+      .then(res => {
+        dispatch(loadingActions.hideLoading());
+        dispatch(productActions.loadProducts());
+        dispatch(loadShipments());
+      })
+      .catch(err => {
+        dispatch(loadingActions.hideLoading());
         console.log(err);
       });
   };

@@ -7,6 +7,7 @@ import { Main as MainLayout, Minimal as MinimalLayout } from "../layouts";
 import {
   Dashboard as DashboardView,
   ProductList as ProductListView,
+  AddProduct as AddProductView,
   //   UserList as UserListView,
   //   Typography as TypographyView,
   //   Icons as IconsView,
@@ -44,6 +45,13 @@ const Routes = () => {
         exact
         layout={MainLayout}
         path="/shipments"
+      />
+      <RouteWithLayout
+        authRequired={true}
+        component={AddProductView}
+        exact
+        layout={MainLayout}
+        path="/add-product"
       />
       {/* <RouteWithLayout
         authRequired={false}

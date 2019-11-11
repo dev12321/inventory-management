@@ -8,19 +8,19 @@ const ShipmentModel = mongoose.model("Shipment");
 const ProductModel = mongoose.model("Product");
 
 const addShipment = async ({ body, user }, res) => {
-  const { products, type, name, description } = body;
-  console.log(user);
-  console.log(name, description);
+  const { products, shipmentType, shipmentName, description } = body;
+  // console.log(user);
+  // console.log(shipmentName, description);
   if (user.role > 0) {
     const shipment = {
       products,
-      type,
-      name,
+      shipmentType,
+      shipmentName,
       description,
-      status: 0,
+      shipmentStatus: 0,
       user: user._id
     };
-    if (type === 1) {
+    if (shipmentType === 1) {
       const bulkWriteRes = await ProductModel.bulkWrite(
         products.map(prod => {
           return {
@@ -43,9 +43,43 @@ const addShipment = async ({ body, user }, res) => {
 };
 
 const updateShipment = async ({ body, user }, res) => {
-  const { id, products, status, type } = body;
-  const shipment = ShipmentModel.findById(id);
-  shipment.status = status;
+  const { id, type } = body;
+
+  const shipment = await ShipmentModel.findById(id);
+  // console.log(shipment);
+  const { products } = shipment;
+
+  if (type === "CANCEL") {
+    if (shipment.shipmentType === 1) {
+      const bulkWriteRes = await ProductModel.bulkWrite(
+        products.map(prod => {
+          return {
+            updateOne: {
+              filter: { _id: prod.product },
+              update: { $inc: { quantity: prod.quantity } }
+            }
+          };
+        })
+      );
+      console.log(bulkWriteRes);
+    }
+    shipment.shipmentStatus = 2;
+  } else if (type === "COMPLETE") {
+    if (shipment.shipmentType === 0) {
+      const bulkWriteRes = await ProductModel.bulkWrite(
+        products.map(prod => {
+          return {
+            updateOne: {
+              filter: { _id: prod.product },
+              update: { $inc: { quantity: prod.quantity } }
+            }
+          };
+        })
+      );
+      console.log(bulkWriteRes);
+    }
+    shipment.shipmentStatus = 1;
+  }
 
   await shipment.save();
   res.status(200).json({ payload: shipment, message: "success" });
@@ -84,7 +118,9 @@ const getShipment = async ({ user }, res) => {
 };
 
 const getShipmentsByStatus = async (req, res) => {
-  const shipments = await ShipmentModel.find({ status: req.params.status })
+  const shipments = await ShipmentModel.find({
+    shipmentStatus: req.params.shipmentStatus
+  })
     .skip(req.query.offset)
     .limit(req.query.limit)
     .populate();
@@ -93,7 +129,9 @@ const getShipmentsByStatus = async (req, res) => {
   else res.status(200).json({ err: "No Documents Found" });
 };
 const getShipmentsByType = async (req, res) => {
-  const shipments = await ShipmentModel.find({ type: req.params.type })
+  const shipments = await ShipmentModel.find({
+    shipmentType: req.params.shipmentType
+  })
     .skip(req.query.offset)
     .limit(req.query.limit)
     .populate();

@@ -1,1 +1,5 @@
-export { loadShipments, deleteShipment } from "./shipmentActions";
+export {
+  loadShipments,
+  deleteShipment,
+  updateShipment
+} from "./shipmentActions";

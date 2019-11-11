@@ -3,3 +3,17 @@ export const LOAD_USER = "LOAD_USER";
 export const LOAD_ALL_PRODUCTS = "LOAD_ALL_PRODUCTS";
 export const LOAD_ALL_SHIPMENTS = "LOAD_ALL_SHIPMENTS";
 export const UPDATE_LOADING = "UPDATE_LOADING";
+export const SHIPMENT_TYPES = {
+  0: "INCOMING",
+  1: "OUTGOING",
+  INCOMING: 0,
+  OUTGOING: 1
+};
+export const SHIPMENT_STATUS = {
+  0: "SCHEDULED",
+  1: "COMPLETED",
+  2: "CANCELLED",
+  SCHEDULED: 0,
+  COMPLETED: 1,
+  CANCELLED: 2
+};

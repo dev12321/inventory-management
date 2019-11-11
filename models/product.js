@@ -36,8 +36,7 @@ const ProductSchema = new mongoose.Schema(
     },
     group: {
       type: mongoose.SchemaTypes.ObjectId,
-      ref: "Group",
-      required: [true, "Specify the group"]
+      ref: "Group"
     },
     user: {
       type: mongoose.SchemaTypes.ObjectId,

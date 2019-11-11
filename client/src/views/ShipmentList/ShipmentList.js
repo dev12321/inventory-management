@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Paper, Switch, FormControlLabel } from "@material-ui/core";
+import { Paper, Switch, FormControlLabel, Typography } from "@material-ui/core";
 import axios from "axios";
 import MaterialTable, { MTableToolbar } from "material-table";
 import { connect } from "react-redux";
@@ -12,13 +12,13 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker
 } from "@material-ui/pickers";
+import { SHIPMENT_TYPES, SHIPMENT_STATUS } from "../../utils/constants";
 
 class ShipmentList extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoaded: false,
-      selection: true,
       dialogOpen: false
     };
   }
@@ -53,60 +53,30 @@ class ShipmentList extends Component {
     });
 
     const columns = [
-      { field: "UPC", title: "ID" },
-
-      { field: "shipmentName", title: "Name" },
+      { field: "shipmentName", title: "Shipment Name" },
       {
         field: "description",
         title: "Description"
         // render: data => data.description.slice(0, 100) + "..."
       },
-      { field: "brand", title: "Brand" },
-      { field: "price", title: "Price" },
-      { field: "quantity", title: "Quantity" },
       {
-        field: "manufacturingDate",
-        title: "MFD",
-        render: data => new Date(data.manufacturingDate).toLocaleDateString(),
-        editComponent: props => (
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <KeyboardDatePicker
-              margin="normal"
-              id="date-picker-dialog"
-              label="MFD"
-              format="dd/MM/yyyy"
-              value={props.value}
-              onChange={value => {
-                props.onChange(new Date(value));
-              }}
-              KeyboardButtonProps={{
-                "aria-label": "change date"
-              }}
-            />
-          </MuiPickersUtilsProvider>
+        field: "shipmentType",
+        title: "Shipment Type",
+        render: data => (
+          <Typography>{SHIPMENT_TYPES[data.shipmentType]}</Typography>
         )
       },
       {
-        field: "expiryDate",
-        title: "Expiry Date",
-        render: data => new Date(data.expiryDate).toLocaleDateString(),
-        editComponent: props => (
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <KeyboardDatePicker
-              margin="normal"
-              id="date-picker-dialog"
-              label="Expiry Date"
-              format="dd/MM/yyyy"
-              value={props.value}
-              onChange={value => {
-                props.onChange(new Date(value));
-              }}
-              KeyboardButtonProps={{
-                "aria-label": "change date"
-              }}
-            />
-          </MuiPickersUtilsProvider>
+        field: "shipmentStatus",
+        title: "Shipment Status",
+        render: data => (
+          <Typography>{SHIPMENT_STATUS[data.shipmentStatus]}</Typography>
         )
+      },
+      {
+        field: "createdAt",
+        title: "Entry Create At",
+        render: data => new Date(data.createdAt).toLocaleDateString()
       }
     ];
 
@@ -124,38 +94,45 @@ class ShipmentList extends Component {
               columns={columns}
               data={this.props.shipmentsList}
               options={{
-                actionsColumnIndex: -1,
-                selection: this.state.selection
+                actionsColumnIndex: -1
               }}
-              // editable={
-              //   !this.state.selection
-              //     ? {
-              //         onRowUpdate: (newData, oldData) =>
-              //           new Promise(resolve => {
-              //             resolve();
-              //             if (oldData) {
-              //             }
-              //           }),
-              //         onRowDelete: oldData =>
-              //           new Promise(resolve => {
-              //             this.props.deleteShipment(oldData);
-              //             resolve();
-              //           })
-              //       }
-              //     : {}
-              // }
+              // editable={{
+              //   onRowDelete: oldData =>
+              //     new Promise(resolve => {
+              //       this.props.deleteShipment(oldData);
+              //       resolve();
+              //     })
+              // }}
               actions={[
-                {
-                  tooltip: "Accept the Shipment",
-                  icon: "hourglass_full",
-                  onClick: (evt, data) => {
-                    this.setState({
-                      selectedShipments: data,
-                      dialogOpen: true
-                    });
-                    // alert("You want to delete " + data.length + " rows");
-                    console.log(data);
-                  }
+                rowData => {
+                  return {
+                    tooltip: "Accept Shipment",
+                    icon: "done_all",
+                    onClick: (evt, data) => {
+                      // this.setState({
+                      //   selectedShipments: data,
+                      //   dialogOpen: true
+                      // });
+                      console.log(data);
+                      this.props.receiveShipment(data);
+                    },
+                    disabled: rowData.shipmentStatus > 0
+                  };
+                },
+                rowData => {
+                  return {
+                    tooltip: "Cancel",
+                    icon: "cancel_schedule_send",
+                    onClick: (evt, data) => {
+                      // this.setState({
+                      //   selectedShipments: data,
+                      //   dialogOpen: true
+                      // });
+                      console.log(data);
+                      this.props.cancelShipment(data);
+                    },
+                    disabled: rowData.shipmentStatus !== 0
+                  };
                 }
               ]}
               // components={{
@@ -200,6 +177,12 @@ const mapDispachToProps = (dispatch, props) => ({
   },
   loadAllShipments: shipments => {
     dispatch(shipmentActions.loadShipments(shipments));
+  },
+  receiveShipment: shipment => {
+    dispatch(shipmentActions.updateShipment("COMPLETE", shipment));
+  },
+  cancelShipment: shipment => {
+    dispatch(shipmentActions.updateShipment("CANCEL", shipment));
   }
   // deleteShipment: shipment => {
   //   dispatch(shipmentActions.deleteShipment(shipment));

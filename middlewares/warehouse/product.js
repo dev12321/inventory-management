@@ -31,9 +31,8 @@ const addProduct = async ({ body, user }, res) => {
     if (manufacturingDate) {
       product.manufacturingDate = manufacturingDate;
     }
-    if (quantity) {
-      product.quantity = quantity;
-    }
+    product.quantity = quantity ? quantity : 0;
+
     if (expiryDate) {
       product.expiryDate = expiryDate;
     }
@@ -51,7 +50,7 @@ const addProduct = async ({ body, user }, res) => {
 
 const updateProduct = async ({ body, user }, res) => {
   const {
-    id,
+    _id,
     UPC,
     productName,
     description,
@@ -59,29 +58,30 @@ const updateProduct = async ({ body, user }, res) => {
     manufacturingDate,
     expiryDate,
     brand,
+    price,
     group
   } = body;
   if (user.role > 0) {
-    const product = await productModel.findById(id);
-    // product.UPC = UPC;
-    // product.productName = productName;
-    product.description = description;
-    // product.group = group;
-
-    // if (manufacturingDate) {
-    // product.manufacturingDate = manufacturingDate;
-    // }
-    if (quantity) {
+    const product = await productModel.findById(_id);
+    if (product) {
+      product.UPC = UPC;
+      product.productName = productName;
+      product.description = description;
+      product.price = price;
+      product.manufacturingDate = manufacturingDate;
       product.quantity = quantity;
+      product.expiryDate = expiryDate;
+      product.brand = brand;
+      if (group) product.group = group;
+      await product.save();
+      res.status(200).json({
+        payload: product,
+        message: "Successfully updated Product"
+      });
+    } else {
+      res.status(404).json({ message: "Product Not Found with the given ID" });
     }
-    // if (expiryDate) {
-    // product.expiryDate = expiryDate;
-    // }
-    // if (brand) {
-    // product.brand = brand;
-    // }
-    await product.save();
-    res.status(200).json({ payload: product, message: "success" });
+    // await product.save();
   } else {
     res.status(403).json({ err: "Not Autherised" });
   }

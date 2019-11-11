@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import * as productActions from "./../../reducerActions/products";
+import * as shipmentActions from "./../../reducerActions/shipments";
 import * as loadingActions from "./../../reducerActions/loading";
 import * as groupActions from "./../../reducerActions/groups";
 import {
@@ -139,8 +140,8 @@ function ShipmentDialog(props) {
         <Formik
           initialValues={{
             products: props.data,
-            type: 0,
-            name: "",
+            shipmentType: 0,
+            shipmentName: "",
             description: ""
           }}
           onSubmit={values => {
@@ -158,8 +159,8 @@ function ShipmentDialog(props) {
                   quantity: prod.quantity
                 };
               }),
-              type: values.type,
-              name: values.name,
+              shipmentType: values.shipmentType,
+              shipmentName: values.shipmentName,
               description: values.description
             };
 
@@ -183,6 +184,7 @@ function ShipmentDialog(props) {
                 });
                 props.loadAllProducts();
                 props.handleClose();
+                props.loadAllShipments();
                 setIsSubmiting(false);
               })
               .catch(err => {
@@ -196,19 +198,29 @@ function ShipmentDialog(props) {
               });
           }}
           validationSchema={Yup.object().shape({
-            products: Yup.array().of(
-              Yup.object().shape({
-                product: Yup.string(),
-                quantity: Yup.number()
-                  .when("maxQuantity", (value, schema) => {
-                    // console.log(value);
-                    return schema.max(value ? value : 0);
+            products: Yup.array().when("shipmentType", (valueP, schemaP) => {
+              if (valueP === 0) {
+                return schemaP.of(
+                  Yup.object().shape({
+                    product: Yup.string(),
+                    quantity: Yup.number().required("Quantity is required")
                   })
-                  .required("Quantity is required")
-              })
-            ),
-            type: Yup.number().required("Type is Required"),
-            name: Yup.string().required("Name is Required"),
+                );
+              } else {
+                return schemaP.of(
+                  Yup.object().shape({
+                    product: Yup.string(),
+                    quantity: Yup.number()
+                      .when("maxQuantity", (value, schema) => {
+                        return schema.max(value ? value : 0);
+                      })
+                      .required("Quantity is required")
+                  })
+                );
+              }
+            }),
+            shipmentType: Yup.number().required("Type is Required"),
+            shipmentName: Yup.string().required("Name is Required"),
             description: Yup.string().required("Description is Required")
           })}
           validateOnChange
@@ -236,12 +248,12 @@ function ShipmentDialog(props) {
                       label="Shipment Name"
                       margin="normal"
                       variant="outlined"
-                      name="name"
-                      value={values.name}
+                      name="shipmentName"
+                      value={values.shipmentName}
                       onChange={handleChange}
                     />
                     <ErrorMessage
-                      name={`name`}
+                      name={`shipmentName`}
                       render={message => (
                         <Typography
                           variant="subtitle2"
@@ -260,9 +272,9 @@ function ShipmentDialog(props) {
                         Shipment Type
                       </InputLabel>
                       <Select
-                        value={values.type}
+                        value={values.shipmentType}
                         onChange={handleChange}
-                        name="type"
+                        name="shipmentType"
                         // labelWidth={labelWidth}
                       >
                         <MenuItem value={0}>Incoming</MenuItem>
@@ -314,6 +326,7 @@ function ShipmentDialog(props) {
                       <TableHead>
                         <TableRow>
                           <TableCell>Product Name</TableCell>
+                          <TableCell>Current Stock</TableCell>
                           <TableCell>Quantity</TableCell>
                           <TableCell>Remove</TableCell>
                         </TableRow>
@@ -325,9 +338,11 @@ function ShipmentDialog(props) {
                             <TableCell component="th" scope="row">
                               {product.productName}
                             </TableCell>
-                            <TableCell>
+                            <TableCell component="th" scope="row">
+                              {product.maxQuantity}
+                            </TableCell>
+                            <TableCell component="th" scope="row">
                               <Field
-                                type="number"
                                 name={`products[${index}].quantity`}
                                 component={NumberFormatCustom}
                               />
@@ -343,7 +358,7 @@ function ShipmentDialog(props) {
                                 )}
                               />
                             </TableCell>
-                            <TableCell>
+                            <TableCell component="th" scope="row">
                               <Button onClick={() => remove(index)}>
                                 {" "}
                                 Remove Item
@@ -372,16 +387,16 @@ function ShipmentDialog(props) {
                 margin="normal"
                 required
                 fullWidth
-                id="status"
+                id="shipmentStatus"
                 label="Email Address"
-                name="status"
+                name="shipmentStatus"
                 autoFocus
                 onChange={handleChange}
-                value={values.status}
+                value={values.shipmentStatus}
               />
               <div>
                 <ErrorMessage
-                  name="status"
+                  name="shipmentStatus"
                   render={message => (
                     <Typography variant="subtitle2" style={{ color: "red" }}>
                       {message}
@@ -453,6 +468,9 @@ const mapDispachToProps = (dispatch, props) => ({
   },
   loadAllProducts: () => {
     dispatch(productActions.loadProducts());
+  },
+  loadAllShipments: () => {
+    dispatch(shipmentActions.loadShipments());
   },
   deleteProduct: product => {
     dispatch(productActions.deleteProduct(product));

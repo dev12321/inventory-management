@@ -19,11 +19,11 @@ const ShipmentSchema = new mongoose.Schema(
         }
       }
     ],
-    status: {
+    shipmentStatus: {
       type: mongoose.SchemaTypes.Number,
-      required: [true, "Specify the status"]
+      required: [true, "Specify the shipmentStatus"]
     },
-    name: {
+    shipmentName: {
       type: mongoose.SchemaTypes.String,
       required: [true, "Specify the Name"]
     },
@@ -31,9 +31,9 @@ const ShipmentSchema = new mongoose.Schema(
       type: mongoose.SchemaTypes.String,
       required: [true, "Specify the description"]
     },
-    type: {
+    shipmentType: {
       type: mongoose.SchemaTypes.Number,
-      required: [true, "Specify the type"]
+      required: [true, "Specify the shipmentType"]
     },
     user: {
       type: mongoose.SchemaTypes.ObjectId,
