@@ -81,11 +81,6 @@ const Sidebar = props => {
       title: "Account",
       href: "/account",
       icon: <AccountBoxIcon />
-    },
-    {
-      title: "Settings",
-      href: "/settings",
-      icon: <SettingsIcon />
     }
   ];
 

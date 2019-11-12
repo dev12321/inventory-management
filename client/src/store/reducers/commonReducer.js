@@ -3,7 +3,8 @@ import {
   LOAD_ALL_PRODUCTS,
   LOAD_ALL_SHIPMENTS,
   LOAD_USER,
-  UPDATE_LOADING
+  UPDATE_LOADING,
+  LOAD_ALL_USER
 } from "./../../utils/constants";
 
 const intitState = {
@@ -11,6 +12,7 @@ const intitState = {
   currentUser: {},
   productsList: [],
   shipmentsList: [],
+  userList: [],
   loading: false
 };
 
@@ -35,6 +37,11 @@ const commonReducer = (state = intitState, action) => {
       return {
         ...state,
         currentUser: action.payload
+      };
+    case LOAD_ALL_USER:
+      return {
+        ...state,
+        userList: action.payload
       };
     case UPDATE_LOADING:
       return {

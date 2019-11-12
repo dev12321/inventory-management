@@ -3,6 +3,8 @@ export const LOAD_USER = "LOAD_USER";
 export const LOAD_ALL_PRODUCTS = "LOAD_ALL_PRODUCTS";
 export const LOAD_ALL_SHIPMENTS = "LOAD_ALL_SHIPMENTS";
 export const UPDATE_LOADING = "UPDATE_LOADING";
+export const LOAD_ALL_USER = "LOAD_ALL_USER";
+
 export const SHIPMENT_TYPES = {
   0: "INCOMING",
   1: "OUTGOING",
@@ -16,4 +18,13 @@ export const SHIPMENT_STATUS = {
   SCHEDULED: 0,
   COMPLETED: 1,
   CANCELLED: 2
+};
+
+export const USER_ROLES = {
+  0: "USER",
+  1: "ADMIN",
+  2: "SUPER_ADMIN",
+  USER: 0,
+  ADMIN: 1,
+  SUPER_ADMIN: 2
 };

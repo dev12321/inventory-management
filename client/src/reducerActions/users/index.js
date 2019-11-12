@@ -1,1 +1,1 @@
-export { loadUser } from "./userActions";
+export { loadUser, loadAllUsers } from "./userActions";

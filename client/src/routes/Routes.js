@@ -11,7 +11,7 @@ import {
   //   UserList as UserListView,
   //   Typography as TypographyView,
   //   Icons as IconsView,
-  //   Account as AccountView,
+  UserList as UserListView,
   ShipmentList as ShipmentListView,
   SignUp as SignUpView,
   SignIn as SignInView,
@@ -19,7 +19,7 @@ import {
   ForgotPassword as ForgotPasswordView
 } from "../views";
 
-const Routes = () => {
+const Routes = props => {
   return (
     <Switch>
       <Redirect exact from="/" to="/dashboard" />
@@ -53,13 +53,16 @@ const Routes = () => {
         layout={MainLayout}
         path="/add-product"
       />
-      {/* <RouteWithLayout
-        authRequired={false}
-        component={UserListView}
-        exact
-        layout={MainLayout}
-        path="/users"
-      /><RouteWithLayout
+      {props.currentUser.role === 2 || true ? (
+        <RouteWithLayout
+          authRequired={true}
+          component={UserListView}
+          exact
+          layout={MainLayout}
+          path="/users"
+        />
+      ) : null}
+      {/*<RouteWithLayout
         authRequired={false}
         component={TypographyView}
         exact
@@ -136,7 +139,4 @@ const mapStateToProps = state => {
 //   }
 // });
 
-export default connect(
-  mapStateToProps,
-  null
-)(Routes);
+export default connect(mapStateToProps, null)(Routes);

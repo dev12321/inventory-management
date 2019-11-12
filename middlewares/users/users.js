@@ -46,12 +46,12 @@ const loginUser = (req, res) => {
       });
     } else {
       if (!user) {
-        res.json(400, {
+        res.json(403, {
           success: false,
           message: "Email/Password is incorrect"
         });
       } else if (!user.isVerified) {
-        res.json(400, {
+        res.json(401, {
           success: false,
           message: "Your account is still under review"
         });
@@ -105,8 +105,17 @@ const removeUser = ({ body }, res) => {
   }
 };
 
+const getUsers = async (req, res) => {
+  // console.log(req);
+  const users = await userModel.find();
+  if (users.length > 0)
+    res.status(200).json({ payload: users, message: "success" });
+  else res.status(200).json({ message: "No Documents Found" });
+};
+
 module.exports = {
   loginUser,
   registerUser,
-  removeUser
+  removeUser,
+  getUsers
 };

@@ -11,5 +11,6 @@ router.post("/login", validateLoginInput, users.loginUser);
 router.post("/register", validateRegisterInput, users.registerUser);
 router.use(passport.authenticate("jwt", { session: false }));
 router.delete("/delete", users.removeUser);
+router.get("/", users.getUsers);
 
 module.exports = router;
