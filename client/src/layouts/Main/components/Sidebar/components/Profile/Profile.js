@@ -52,7 +52,7 @@ const Profile = props => {
         alt="Person"
         className={classes.avatar}
         component={RouterLink}
-        src={user.avatar}
+        src={"/images/avatars/avatar_11.png"}
         to="/profile"
       >
         {/* {user.fullName[0]} */}D
@@ -87,7 +87,4 @@ const mapStateToProps = state => {
 //   }
 // });
 
-export default connect(
-  mapStateToProps,
-  null
-)(Profile);
+export default connect(mapStateToProps, null)(Profile);

@@ -61,11 +61,11 @@ const Sidebar = props => {
         ]
       : [];
   const pages = [
-    {
-      title: "Dashboard",
-      href: "/dashboard",
-      icon: <DashboardIcon />
-    },
+    // {
+    //   title: "Dashboard",
+    //   href: "/dashboard",
+    //   icon: <DashboardIcon />
+    // },
     ...superAdminPages,
     {
       title: "Products",

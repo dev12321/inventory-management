@@ -10,7 +10,7 @@ import {
   AddProduct as AddProductView,
   //   UserList as UserListView,
   //   Typography as TypographyView,
-  //   Icons as IconsView,
+  Account as AccountView,
   UserList as UserListView,
   ShipmentList as ShipmentListView,
   SignUp as SignUpView,
@@ -24,13 +24,13 @@ const Routes = props => {
     <Switch>
       <Redirect exact from="/" to="/dashboard" />
 
-      <RouteWithLayout
+      {/* <RouteWithLayout
         authRequired={true}
         component={DashboardView}
         exact
         layout={MainLayout}
         path="/dashboard"
-      />
+      /> */}
 
       <RouteWithLayout
         authRequired={true}
@@ -62,6 +62,13 @@ const Routes = props => {
           path="/users"
         />
       ) : null}
+      <RouteWithLayout
+        authRequired={true}
+        component={AccountView}
+        exact
+        layout={MainLayout}
+        path="/account"
+      />
       {/*<RouteWithLayout
         authRequired={false}
         component={TypographyView}
@@ -76,13 +83,7 @@ const Routes = props => {
         layout={MainLayout}
         path="/icons"
       />
-      <RouteWithLayout
-        authRequired={false}
-        component={AccountView}
-        exact
-        layout={MainLayout}
-        path="/account"
-      />
+     
       <RouteWithLayout
         authRequired={false}
         component={SettingsView}
