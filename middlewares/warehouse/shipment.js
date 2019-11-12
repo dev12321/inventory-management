@@ -4,6 +4,8 @@ const constants = require("../../utils/constants");
 
 require("../../models/shipment");
 require("../../models/user");
+require("../../models/notification");
+const notificationModel = mongoose.model("Notification");
 const ShipmentModel = mongoose.model("Shipment");
 const ProductModel = mongoose.model("Product");
 
@@ -20,9 +22,11 @@ const addShipment = async ({ body, user }, res) => {
       shipmentStatus: 0,
       user: user._id
     };
+    let count = 0;
     if (shipmentType === 1) {
       const bulkWriteRes = await ProductModel.bulkWrite(
         products.map(prod => {
+          count = count + prod.quantity;
           return {
             updateOne: {
               filter: { _id: prod.product },
@@ -34,6 +38,13 @@ const addShipment = async ({ body, user }, res) => {
       console.log(bulkWriteRes);
     }
     await new ShipmentModel(shipment).save();
+    const notification = {
+      title: `New Shipment Scheduled`,
+      body: `A new shipment with the name '${shipmentName}' is scheduled with total of ${count} items containing ${products.length} different product.`,
+      isRead: false,
+      accessLevel: 0
+    };
+    await new notificationModel(notification).save();
     res
       .status(200)
       .json({ payload: shipment, message: "Shipment succesfully added" });
@@ -64,6 +75,13 @@ const updateShipment = async ({ body, user }, res) => {
       console.log(bulkWriteRes);
     }
     shipment.shipmentStatus = 2;
+    const notification = {
+      title: `Shipment Cancelled`,
+      body: `A shipment with the name '${shipmentName}' is cancelled`,
+      isRead: false,
+      accessLevel: 0
+    };
+    await new notificationModel(notification).save();
   } else if (type === "COMPLETE") {
     if (shipment.shipmentType === 0) {
       const bulkWriteRes = await ProductModel.bulkWrite(
@@ -79,6 +97,13 @@ const updateShipment = async ({ body, user }, res) => {
       console.log(bulkWriteRes);
     }
     shipment.shipmentStatus = 1;
+    const notification = {
+      title: `Shipment Cancelled`,
+      body: `A shipment with the name '${shipmentName}' is completed`,
+      isRead: false,
+      accessLevel: 0
+    };
+    await new notificationModel(notification).save();
   }
 
   await shipment.save();
@@ -90,6 +115,13 @@ const deleteShipment = async ({ body, user }, res) => {
   if (user.role > 0) {
     const shipment = ShipmentModel.findByIdAndDelete(id);
     if (shipment) {
+      const notification = {
+        title: `Shipment Cancelled`,
+        body: `A shipment with the name '${shipmentName}' is deleted`,
+        isRead: false,
+        accessLevel: 0
+      };
+      await new notificationModel(notification).save();
       res.status(200).json({ payload: shipment, message: "success" });
     } else {
       res.status(200).json({ err: "shipment not found" });
@@ -103,7 +135,8 @@ const getShipments = async (req, res) => {
   const shipments = await ShipmentModel.find()
     .skip(req.query.offset)
     .limit(req.query.limit)
-    .populate();
+    .populate("products.product")
+    .populate("user");
   if (shipments.length > 0)
     res.status(200).json({ payload: shipments, message: "success" });
   else res.status(200).json({ err: "No Documents Found" });

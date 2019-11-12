@@ -24,13 +24,13 @@ const Routes = props => {
     <Switch>
       <Redirect exact from="/" to="/dashboard" />
 
-      {/* <RouteWithLayout
+      <RouteWithLayout
         authRequired={true}
         component={DashboardView}
         exact
         layout={MainLayout}
         path="/dashboard"
-      /> */}
+      />
 
       <RouteWithLayout
         authRequired={true}

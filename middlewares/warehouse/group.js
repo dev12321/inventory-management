@@ -2,8 +2,10 @@ const uidGenerator = require("../../utils/uniqueIDGenerator");
 const mongoose = require("mongoose");
 const constants = require("../../utils/constants");
 
+require("../../models/notification");
 require("../../models/group");
 const groupModel = mongoose.model("Group");
+const notificationModel = mongoose.model("Notification");
 
 const addGroup = async ({ body, user }, res) => {
   const { groupName, parentGroup } = body;
@@ -16,6 +18,13 @@ const addGroup = async ({ body, user }, res) => {
     }
 
     await new groupModel(group).save();
+    const notification = {
+      title: `New Group Added`,
+      body: `A new group with the name '${groupName}' is added.`,
+      isRead: false,
+      accessLevel: 0
+    };
+    await new notificationModel(notification).save();
     res.status(200).json({ payload: group, message: "success" });
   } else {
     res.status(403).json({ err: "Not Autherised" });
@@ -32,6 +41,14 @@ const updateGroup = async ({ body, user }, res) => {
       group.parentGroup = parentGroup;
     }
 
+    const notification = {
+      title: `Group Detail Updated`,
+      body: `The group with the name '${groupName}' is updated.`,
+      isRead: false,
+      accessLevel: 0
+    };
+    await new notificationModel(notification).save();
+
     await group.save();
     res.status(200).json({ payload: group, message: "success" });
   } else {
@@ -44,6 +61,13 @@ const deleteGroup = async ({ body, user }, res) => {
   if (user.role > 0) {
     const group = groupModel.findByIdAndDelete(id);
     if (group) {
+      const notification = {
+        title: `Group Deleted`,
+        body: `The group with the name '${groupName}' is deleted.`,
+        isRead: false,
+        accessLevel: 0
+      };
+      await new notificationModel(notification).save();
       res.status(200).json({ payload: group, message: "success" });
     } else {
       res.status(200).json({ err: "group not found" });

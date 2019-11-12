@@ -4,7 +4,8 @@ import {
   LOAD_ALL_SHIPMENTS,
   LOAD_USER,
   UPDATE_LOADING,
-  LOAD_ALL_USER
+  LOAD_ALL_USER,
+  LOAD_NOTIFICATIONS
 } from "./../../utils/constants";
 
 const intitState = {
@@ -13,6 +14,7 @@ const intitState = {
   productsList: [],
   shipmentsList: [],
   userList: [],
+  notifications: [],
   loading: false
 };
 
@@ -47,6 +49,11 @@ const commonReducer = (state = intitState, action) => {
       return {
         ...state,
         loading: action.payload.loading
+      };
+    case LOAD_NOTIFICATIONS:
+      return {
+        ...state,
+        notifications: action.payload
       };
 
     default:

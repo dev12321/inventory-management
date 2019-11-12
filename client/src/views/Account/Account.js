@@ -91,8 +91,9 @@ function Account(props) {
       <Grid item xs={4}>
         <Grid
           container
-          style={{ alignItems: "center", padding: "10px" }}
+          style={{ alignItems: "center", padding: "10px", marginTop: "30vh" }}
           direction="column"
+          spacing={2}
         >
           {/* <Grid item>
             <Avatar
@@ -103,23 +104,23 @@ function Account(props) {
             />
           </Grid> */}
           <Grid item>
-            <Typography variant="h1">{fullName}</Typography>
+            <Typography variant="h1">{`Name:  ${fullName}`}</Typography>
           </Grid>
           <Grid item>
-            <Typography variant="subtitle1">{username}</Typography>
+            <Typography variant="subtitle1">{`Email:  ${username}`}</Typography>
           </Grid>
           <Grid item>
-            <Typography variant="subtitle1">{phone}</Typography>
+            <Typography variant="subtitle1">{`Contact No: ${phone}`}</Typography>
           </Grid>
           <Grid item>
-            <Typography variant="subtitle1">{USER_ROLES[role]}</Typography>
+            <Typography variant="subtitle1">{`User Role:  ${USER_ROLES[role]}`}</Typography>
           </Grid>
         </Grid>
       </Grid>
       {/* <Grid item xs={2}>
         <Divider orientation="vertical" style={{ margin: "10px" }} />
       </Grid> */}
-      <Grid item xs={4}>
+      {/* <Grid item xs={4}>
         <Formik
           initialValues={{
             username: props.currentUser.username,
@@ -233,18 +234,10 @@ function Account(props) {
               >
                 Update
               </Button>
-              {/* <Grid container>
-                <Grid item xs>
-                  <Link to="/forgot-password">Forgot password?</Link>
-                </Grid>
-                <Grid item>
-                  <Link to="/sign-up">{"Don't have an account? Sign Up"}</Link>
-                </Grid>
-              </Grid> */}
             </form>
           )}
         />
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 }

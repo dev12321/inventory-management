@@ -8,6 +8,7 @@ import * as productActions from "../../reducerActions/products";
 import * as loadingActions from "../../reducerActions/loading";
 import * as shipmentActions from "../../reducerActions/shipments";
 import * as groupActions from "../../reducerActions/groups";
+import PDF from "../../components/PDF";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker
@@ -19,9 +20,14 @@ class ShipmentList extends Component {
     super(props);
     this.state = {
       isLoaded: false,
-      dialogOpen: false
+      dialogOpen: false,
+      open: false,
+      selectedShipment: null
     };
   }
+  handleClose = () => {
+    this.setState({ open: false, selectedShipment: null });
+  };
 
   componentDidMount() {
     if (!this.state.isLoaded && this.props.shipmentsList.length === 0) {
@@ -121,6 +127,22 @@ class ShipmentList extends Component {
                 },
                 rowData => {
                   return {
+                    tooltip: "View Shipmemt Details",
+                    icon: "done_all",
+                    onClick: (evt, data) => {
+                      // this.setState({
+                      //   selectedShipments: data,
+                      //   dialogOpen: true
+                      // });
+                      // console.log(data);
+                      this.setState({ selectedShipment: data, open: true });
+                      // this.props.receiveShipment(data);
+                    }
+                    // disabled: rowData.shipmentStatus > 0
+                  };
+                },
+                rowData => {
+                  return {
                     tooltip: "Cancel",
                     icon: "cancel_schedule_send",
                     onClick: (evt, data) => {
@@ -156,6 +178,13 @@ class ShipmentList extends Component {
             />
           </div>
         </Paper>
+        {this.state.open && this.state.selectedShipment ? (
+          <PDF
+            handleClose={this.handleClose}
+            open={this.state.open}
+            shipment={this.state.selectedShipment}
+          />
+        ) : null}
       </>
     );
   }
@@ -189,7 +218,4 @@ const mapDispachToProps = (dispatch, props) => ({
   // }
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispachToProps
-)(ShipmentList);
+export default connect(mapStateToProps, mapDispachToProps)(ShipmentList);

@@ -2,7 +2,9 @@ const uidGenerator = require("../../utils/uniqueIDGenerator");
 const mongoose = require("mongoose");
 const constants = require("../../utils/constants");
 
+require("../../models/notification");
 require("../../models/product");
+const notificationModel = mongoose.model("Notification");
 const productModel = mongoose.model("Product");
 
 const addProduct = async ({ body, user }, res) => {
@@ -41,7 +43,13 @@ const addProduct = async ({ body, user }, res) => {
     }
     await new productModel(product).save();
     // console.log(product);
-
+    const notification = {
+      title: `New Product Added`,
+      body: `A new product with the name '${productName}' is added.`,
+      isRead: false,
+      accessLevel: 0
+    };
+    await new notificationModel(notification).save();
     res.status(200).json({ payload: product, message: "success" });
   } else {
     res.status(403).json({ err: "Not Autherised" });
@@ -74,6 +82,13 @@ const updateProduct = async ({ body, user }, res) => {
       product.brand = brand;
       if (group) product.group = group;
       await product.save();
+      const notification = {
+        title: `Product Updated`,
+        body: `The details of the product with the name '${productName}' is updated.`,
+        isRead: false,
+        accessLevel: 0
+      };
+      await new notificationModel(notification).save();
       res.status(200).json({
         payload: product,
         message: "Successfully updated Product"
@@ -91,7 +106,13 @@ const deleteProduct = async ({ body, user }, res) => {
   const { id } = body;
   if (user.role > 0) {
     const product = await productModel.findByIdAndDelete(id);
-
+    const notification = {
+      title: `Product Deleted`,
+      body: `The product with the name '${productName}' is deleted.`,
+      isRead: false,
+      accessLevel: 0
+    };
+    await new notificationModel(notification).save();
     if (product) {
       res.status(200).json({ payload: product, message: "success" });
     } else {

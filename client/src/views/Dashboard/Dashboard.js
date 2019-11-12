@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -14,21 +14,32 @@ import {
   Container,
   Grid,
   Paper,
-  Link
+  Link,
+  ListItem,
+  ListItemAvatar,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  Avatar
 } from "@material-ui/core";
 import {
   MenuIcon,
   ChevronLeftIcon,
-  NotificationsIcon
+  Notifications as NotificationsIcon,
+  Visibility as VisibilityIcon,
+  Delete as DeleteIcon
 } from "@material-ui/icons";
+import { connect } from "react-redux";
+import * as notificationActions from "./../../reducerActions/notifications";
 // import { mainListItems, secondaryListItems } from "./listItems";
+import PDF from "../../components/PDF";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
       <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+        Inventory Management
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -117,9 +128,17 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Dashboard() {
+function Dashboard(props) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!isLoaded) {
+      props.loadNotifications();
+      setIsLoaded(true);
+    }
+  });
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -130,77 +149,83 @@ export default function Dashboard() {
 
   return (
     <div className={classes.root}>
-      {/* <CssBaseline />
-      <AppBar position="absolute" className={clsx(classes.appBar)}>
-        <Toolbar className={classes.toolbar}>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            className={clsx(
-              classes.menuButton,
-              open && classes.menuButtonHidden
-            )}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            component="h1"
-            variant="h6"
-            color="inherit"
-            noWrap
-            className={classes.title}
-          >
-            Dashboard
-          </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="permanent"
-        classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)
-        }}
-        open={open}
-      >
-        <div className={classes.toolbarIcon}></div>
-        <Divider />
-        <div
-          className={clsx(
-            classes.toolbarIcon,
-            !open && classes.menuButtonHidden
-          )}
-        >
-          <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </div>
-        <Divider />
-        <List>{mainListItems}</List>
-        <Divider />
-        <List>{secondaryListItems}</List>
-      </Drawer> */}
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
-          <Grid container spacing={3}>
-            {/* Recent Deposits */}
-            <Grid item xs={12} md={4} lg={3}>
-              <Paper className={fixedHeightPaper}>{/* <Deposits /> */}</Paper>
-            </Grid>
-            {/* Recent Orders */}
-            <Grid item xs={12}>
-              <Paper className={classes.paper}>{/* <Orders /> */}</Paper>
-            </Grid>
+        <Grid container spacing={2} direction="row">
+          <Grid item xs={5}>
+            <Typography>Something</Typography>
           </Grid>
-        </Container>
+          <Grid item xs={2}>
+            <Divider orientation="vertical" />
+          </Grid>
+          <Grid item xs={5}>
+            <Typography variant="h6" className={classes.title}>
+              Notifications
+            </Typography>
+            <div>
+              <List>
+                {props.notifications.map(notification => {
+                  return (
+                    <ListItem>
+                      <ListItemAvatar>
+                        <Avatar>
+                          <NotificationsIcon />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={`${notification.title} ${
+                          notification.isRead ? "(READ)" : ""
+                        }`}
+                        secondary={notification.body}
+                      />
+                      <ListItemSecondaryAction>
+                        {!notification.isRead ? (
+                          <IconButton
+                            edge="end"
+                            aria-label="read"
+                            onClick={() => props.readNotification(notification)}
+                          >
+                            <VisibilityIcon />
+                          </IconButton>
+                        ) : null}
+                        <IconButton
+                          edge="end"
+                          aria-label="delete"
+                          onClick={() => props.deleteNotification(notification)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </div>
+          </Grid>
+        </Grid>
         <Copyright />
       </main>
     </div>
   );
 }
+
+const mapStateToProps = state => {
+  return {
+    currentUser: state.common.currentUser,
+    notifications: state.common.notifications
+  };
+};
+
+const mapDispachToProps = (dispatch, props) => ({
+  loadNotifications: () => {
+    dispatch(notificationActions.loadNotifications());
+  },
+  readNotification: notification => {
+    dispatch(notificationActions.readNotification(notification));
+  },
+  deleteNotification: notification => {
+    dispatch(notificationActions.deleteNotification(notification));
+  }
+});
+
+export default connect(mapStateToProps, mapDispachToProps)(Dashboard);
