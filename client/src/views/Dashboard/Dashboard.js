@@ -31,8 +31,10 @@ import {
 } from "@material-ui/icons";
 import { connect } from "react-redux";
 import * as notificationActions from "./../../reducerActions/notifications";
+import * as shipmentActions from "./../../reducerActions/shipments";
 // import { mainListItems, secondaryListItems } from "./listItems";
 import PDF from "../../components/PDF";
+import Chart from "react-google-charts";
 
 function Copyright() {
   return (
@@ -135,7 +137,10 @@ function Dashboard(props) {
 
   useEffect(() => {
     if (!isLoaded) {
+      console.log("START");
+
       props.loadNotifications();
+      props.loadShipments();
       setIsLoaded(true);
     }
   });
@@ -147,60 +152,211 @@ function Dashboard(props) {
   };
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
+  Array.prototype.groupBy = function(prop) {
+    return this.reduce(function(groups, item) {
+      const val = item[prop];
+      groups[val] = groups[val] || [];
+      groups[val].push(item);
+      return groups;
+    }, {});
+  };
+
+  const generateChartData = type => {
+    console.log(props.shipmentsList);
+    const groupedData = props.shipmentsList
+      .filter(el => el.shipmentType === type)
+      .map(shipment => {
+        const totalCount = shipment.products
+          .map(product => product.quantity)
+          .reduce((total, quantity) => {
+            // console.log(total, quantity);
+
+            return total + quantity;
+          });
+        // console.log(totalCount);
+        const createdAt = new Date(shipment.createdAt);
+
+        return {
+          createdAt: new Date(
+            createdAt.getFullYear(),
+            createdAt.getMonth(),
+            createdAt.getDate()
+          ),
+          totalCount
+        };
+      })
+      .groupBy("createdAt");
+    // console.log(groupedData);
+
+    const data = Object.keys(groupedData).map(date => {
+      return [
+        new Date(date),
+        groupedData[date]
+          .map(el => el.totalCount)
+          .reduce((total, quantity) => total + quantity)
+      ];
+    });
+
+    // console.log(data);
+    return data;
+  };
+
+  const generatePieData = () => {
+    const data = props.shipmentsList
+      .reduce((products, ship) => {
+        console.log(ship.products);
+        return [...products, ...ship.products];
+      }, [])
+      .map(el => {
+        return {
+          productName: el.product.productName,
+          quantity: el.quantity
+        };
+      })
+      .groupBy("productName");
+    console.log(data);
+
+    const finalData = Object.keys(data).map(prodName => {
+      return [
+        prodName,
+        data[prodName]
+          .map(el => el.quantity)
+          .reduce((total, quantity) => {
+            return total + quantity;
+          })
+      ];
+    });
+    console.log(finalData);
+    return finalData;
+  };
+
   return (
     <div className={classes.root}>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Grid container spacing={2} direction="row">
-          <Grid item xs={5}>
-            <Typography>Something</Typography>
+        <Grid container spacing={2} direction="column">
+          <Grid item xs={12}>
+            <Chart
+              width={1000}
+              style={{ margin: "auto" }}
+              // height={350}
+              chartType="Calendar"
+              loader={<div>Loading Chart</div>}
+              data={[
+                [
+                  { type: "date", id: "Date" },
+                  { type: "number", id: "item" }
+                ],
+                // [new Date(2012, 3, 13), 37032],
+
+                ...generateChartData(1)
+              ]}
+              options={{
+                title: "Outgoing Shipment Heatmap",
+                noDataPattern: {
+                  backgroundColor: "#aaa",
+                  color: "#aaa"
+                }
+              }}
+              rootProps={{ "data-testid": "1" }}
+            />
           </Grid>
-          <Grid item xs={2}>
-            <Divider orientation="vertical" />
+          <Grid item xs={12}>
+            <Chart
+              width={1000}
+              height={350}
+              style={{ margin: "auto" }}
+              chartType="Calendar"
+              loader={<div>Loading Chart</div>}
+              data={[
+                [
+                  { type: "date", id: "Date" },
+                  { type: "number", id: "item" }
+                ],
+                // [new Date(2012, 3, 13), 37032],
+
+                ...generateChartData(1)
+              ]}
+              options={{
+                title: "Incoming Shipment Heatmap",
+                noDataPattern: {
+                  backgroundColor: "#76a7fa",
+                  color: "#a0c3ff"
+                }
+              }}
+              rootProps={{ "data-testid": "1" }}
+            />
           </Grid>
-          <Grid item xs={5}>
-            <Typography variant="h6" className={classes.title}>
-              Notifications
-            </Typography>
-            <div>
-              <List>
-                {props.notifications.map(notification => {
-                  return (
-                    <ListItem>
-                      <ListItemAvatar>
-                        <Avatar>
-                          <NotificationsIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={`${notification.title} ${
-                          notification.isRead ? "(READ)" : ""
-                        }`}
-                        secondary={notification.body}
-                      />
-                      <ListItemSecondaryAction>
-                        {!notification.isRead ? (
-                          <IconButton
-                            edge="end"
-                            aria-label="read"
-                            onClick={() => props.readNotification(notification)}
-                          >
-                            <VisibilityIcon />
-                          </IconButton>
-                        ) : null}
-                        <IconButton
-                          edge="end"
-                          aria-label="delete"
-                          onClick={() => props.deleteNotification(notification)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  );
-                })}
-              </List>
-            </div>
+          <Grid item xs={12}>
+            <Grid container direction="row">
+              <Grid item xs={5}>
+                <Chart
+                  width={"500px"}
+                  height={"300px"}
+                  chartType="PieChart"
+                  loader={<div>Loading Chart</div>}
+                  data={[
+                    ["Product", "No. of Transactions"],
+                    ...generatePieData()
+                  ]}
+                  options={{
+                    title: "Trending Products"
+                  }}
+                  rootProps={{ "data-testid": "1" }}
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <Divider variant={"vertical"} />
+              </Grid>
+              <Grid item xs={5}>
+                <Typography variant="h6" className={classes.title}>
+                  Notifications
+                </Typography>
+                <div>
+                  <List>
+                    {props.notifications.map(notification => {
+                      return (
+                        <ListItem>
+                          <ListItemAvatar>
+                            <Avatar>
+                              <NotificationsIcon />
+                            </Avatar>
+                          </ListItemAvatar>
+                          <ListItemText
+                            primary={`${notification.title} ${
+                              notification.isRead ? "(READ)" : ""
+                            }`}
+                            secondary={notification.body}
+                          />
+                          <ListItemSecondaryAction>
+                            {!notification.isRead ? (
+                              <IconButton
+                                edge="end"
+                                aria-label="read"
+                                onClick={() =>
+                                  props.readNotification(notification)
+                                }
+                              >
+                                <VisibilityIcon />
+                              </IconButton>
+                            ) : null}
+                            <IconButton
+                              edge="end"
+                              aria-label="delete"
+                              onClick={() =>
+                                props.deleteNotification(notification)
+                              }
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </div>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
         <Copyright />
@@ -212,13 +368,17 @@ function Dashboard(props) {
 const mapStateToProps = state => {
   return {
     currentUser: state.common.currentUser,
-    notifications: state.common.notifications
+    notifications: state.common.notifications,
+    shipmentsList: state.common.shipmentsList
   };
 };
 
 const mapDispachToProps = (dispatch, props) => ({
   loadNotifications: () => {
     dispatch(notificationActions.loadNotifications());
+  },
+  loadShipments: () => {
+    dispatch(shipmentActions.loadShipments());
   },
   readNotification: notification => {
     dispatch(notificationActions.readNotification(notification));

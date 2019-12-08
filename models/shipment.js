@@ -38,9 +38,13 @@ const ShipmentSchema = new mongoose.Schema(
     user: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "User"
+    },
+    createdAt: {
+      type: mongoose.SchemaTypes.Date,
+      default: Date.now()
     }
-  },
-  { timestamps: true }
+  }
+  // { timestamps: true }
 );
 
 ShipmentSchema.plugin(uniqueValidator, { message: "is already taken." });

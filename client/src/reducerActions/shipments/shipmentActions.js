@@ -7,6 +7,8 @@ import * as productActions from "../products";
 export const loadShipments = () => {
   return (dispatch, getState) => {
     const state = getState();
+    console.log(state);
+
     const token = localStorage.getItem("IToken");
     dispatch(loadingActions.showLoading());
     axios
